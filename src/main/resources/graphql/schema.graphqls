@@ -1,0 +1,29 @@
+type Query {
+  getAllUsers: [User]
+  getUserById(id: ID!): User
+}
+
+type Mutation {
+  createUser(user: CreateUserInput): User
+  deactivateUser(id: ID): User
+}
+
+type User {
+  id: ID!
+  username: String!
+  password: String!
+  email: String!
+}
+
+input CreateUserInput {
+  username: String!
+  password: String!
+  email: String!
+}
+
+#
+# input AccountInput {
+#   username: String!
+#   password: String!
+#   email: String!
+# }

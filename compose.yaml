@@ -1,0 +1,9 @@
+services:
+  postgres:
+    image: "postgres:latest"
+    environment:
+      - POSTGRES_DB=diskord_db
+      - POSTGRES_PASSWORD=ante
+      - POSTGRES_USER=abralic98
+    ports:
+      - "5432:5432"
