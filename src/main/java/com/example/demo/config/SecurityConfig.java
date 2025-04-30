@@ -1,44 +1,30 @@
+
 package com.example.demo.config;
 
+import com.example.demo.config.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
-import org.springframework.security.web.DefaultSecurityFilterChain;
-
-import static org.springframework.security.config.Customizer.withDefaults;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 public class SecurityConfig {
 
   @Bean
-  DefaultSecurityFilterChain springWebFilterChain(HttpSecurity http) throws Exception {
+  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     return http
-        .csrf(c -> c.disable())
-        // Demonstrate that method security works
-        // Best practice to use both for defense in depth
-        .authorizeRequests(requests -> requests.anyRequest().authenticated())
-        .httpBasic(withDefaults())
+        .csrf(AbstractHttpConfigurer::disable)
+        .authorizeHttpRequests(auth -> auth
+            .requestMatchers("/auth/**").permitAll() // Allow login endpoint
+            .requestMatchers("/graphql").permitAll() // GraphQL will check inside resolver
+            .requestMatchers("/graphiql", "/vendor/**", "/static/**").permitAll()  // GraphiQL frontend
+            .anyRequest().authenticated())
+        .addFilterBefore(new JwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
         .build();
   }
-
-
-
-  @Bean
-  public static InMemoryUserDetailsManager users() {
-    User.UserBuilder userBuilder = User.withDefaultPasswordEncoder();
-    UserDetails notAuthorized = userBuilder.username("rob").password("rob")
-        .roles(SECURITY_ROLES.UNAUTHORIZED.toString()).build();
-    UserDetails admin = userBuilder.username("admin").password("admin")
-        .roles(SECURITY_ROLES.ADMIN.toString(), SECURITY_ROLES.MEMBER.toString()).build();
-    UserDetails member = userBuilder.username("member").password("member").roles("MEMBER").build();
-    return new InMemoryUserDetailsManager(notAuthorized, admin, member);
-  }
-
 }

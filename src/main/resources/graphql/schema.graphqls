@@ -6,6 +6,7 @@ type Query {
 type Mutation {
   createUser(user: CreateUserInput): User
   deactivateUser(id: ID): User
+  createSession(credentials: CreateSessionInput): UserWithToken
 }
 
 type User {
@@ -15,15 +16,19 @@ type User {
   email: String!
 }
 
+type UserWithToken {
+  token: String
+  user: User
+}
+
 input CreateUserInput {
   username: String!
   password: String!
   email: String!
 }
 
-#
-# input AccountInput {
-#   username: String!
-#   password: String!
-#   email: String!
-# }
+input CreateSessionInput {
+  username: String!
+  password: String!
+}
+

@@ -2,6 +2,7 @@
 // U SERVICE RADIMO LOGIKU
 package com.example.demo.service.user;
 
+import com.example.demo.config.EndpointProtector;
 import com.example.demo.controller.global.ModifiedException;
 import com.example.demo.controller.inputs.user.CreateUserInput;
 import com.example.demo.model.User;
@@ -31,6 +32,7 @@ public class UserService {
 
   // Get a user by their ID
   public Optional<User> getUserById(Long id) {
+    EndpointProtector.checkAuth();
     try {
       Optional<User> user = userRepository.findById(id);
       System.out.println(user);
@@ -45,6 +47,7 @@ public class UserService {
 
   // Get all users (optional, if needed)
   public Iterable<User> getAllUsers() {
+    EndpointProtector.checkAuth();
     return userRepository.findAll(); // Get all users from DB
   }
 
