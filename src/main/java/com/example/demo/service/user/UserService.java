@@ -8,6 +8,7 @@ import com.example.demo.controller.inputs.user.CreateUserInput;
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -16,16 +17,18 @@ import java.util.Optional;
 public class UserService {
 
   private final UserRepository userRepository;
+  private final PasswordEncoder passwordEncoder;
 
   // Constructor-based dependency injection
-  public UserService(UserRepository userRepository) {
+  public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
     this.userRepository = userRepository;
+    this.passwordEncoder = passwordEncoder;
   }
 
   // Create a new user
   public User createUser(CreateUserInput user) {
-    System.out.println("kita2222");
-    User newUser = new User(user.getUsername(), user.getPassword(), user.getEmail()); // Create
+    String encodedPassword = passwordEncoder.encode(user.getPassword());
+    User newUser = new User(user.getUsername(), encodedPassword , user.getEmail()); // Create
 
     return userRepository.save(newUser);
   }

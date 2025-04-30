@@ -6,9 +6,9 @@ import com.example.demo.controller.inputs.user.CreateSessionInput;
 import com.example.demo.model.User;
 import com.example.demo.model.UserWithToken;
 import com.example.demo.repository.UserRepository;
-import com.example.demo.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,7 +24,7 @@ public class AuthController {
   private UserRepository userRepository;
 
   @Autowired
-  private UserService userService;
+  private PasswordEncoder passwordEncoder;
 
   // GraphQL Mutation to handle login
   @MutationMapping
@@ -35,8 +35,9 @@ public class AuthController {
 
     // Validate the credentials
     User user = userRepository.findByUsername(username);
-    if (user != null && user.getPassword().equals(password)) {
-      // Generate token
+    System.out.println("u mog str");
+    Boolean isPasswordCorrect = passwordEncoder.matches(password, user.getPassword());
+    if (user != null && isPasswordCorrect) {
       String token = jwtUtil.generateToken(username);
 
       // Return UserWithToken containing both user and token

@@ -30,3 +30,4 @@ public class CreateUserInput {
     this.email = email;
   }
 }
+
