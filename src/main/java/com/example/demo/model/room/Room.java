@@ -4,6 +4,7 @@ package com.example.demo.model.room;
 import java.util.Date;
 
 import com.example.demo.model.User;
+import com.example.demo.model.enums.RoomType;
 import com.example.demo.model.server.Server;
 
 import jakarta.persistence.*;
@@ -20,6 +21,9 @@ public class Room {
 
   @Column(nullable = false)
   private String name;
+
+  @Column(nullable = false)
+  private RoomType type;
 
   // Many rooms belong to one server
   @ManyToOne
@@ -43,10 +47,11 @@ public class Room {
 
   }
 
-  public Room(String name, User user, Server server) {
+  public Room(String name, User user, Server server, RoomType type) {
     this.name = name;
     this.server = server;
     this.createdBy = user;
+    this.type = type;
     this.dateCreated = new Date();
     this.dateUpdated = new Date();
   }

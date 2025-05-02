@@ -43,7 +43,7 @@ public class RoomService {
     User user = currentAuthenticatedUser.getUser();
     Server server = serverRepository.getById(input.getServerId());
 
-    Room room = new Room(input.getName(), user, server);
+    Room room = new Room(input.getName(), user, server, input.getType());
     return roomRepository.save(room);
   }
 
