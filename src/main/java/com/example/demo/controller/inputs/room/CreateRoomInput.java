@@ -8,7 +8,6 @@ public class CreateRoomInput {
   private RoomType type;
   private Long serverId;
 
-  // Corrected Getter and Setter
   public String getName() {
     return name;
   }

@@ -10,6 +10,7 @@ type Mutation {
   createSession(credentials: CreateSessionInput): UserWithToken
   createServer(server: CreateServerInput): Server
   createRoom(room: CreateRoomInput): Room
+  createMessage(message: CreateMessageInput): Message
 }
 
 # USERS ##############################
@@ -65,9 +66,14 @@ enum RoomType {
 }
 
 type Message {
-  sender: User!
-  message: String!
+  author: User!
+  text: String!
   imgPath: String
+}
+
+enum MessageType {
+  TEXT
+  ATTACHMENT
 }
 
 input CreateServerInput {
@@ -78,6 +84,12 @@ input CreateRoomInput {
   name: String!
   type: RoomType!
   serverId: ID!
+}
+
+input CreateMessageInput {
+  text: String!
+  type: MessageType!
+  roomId: ID!
 }
 
 ####################################

@@ -1,41 +1,33 @@
-
-package com.example.demo.model.room;
+package com.example.demo.model.message;
 
 import java.util.Date;
-import java.util.List;
 
 import com.example.demo.model.User;
-import com.example.demo.model.enums.RoomType;
-import com.example.demo.model.message.Message;
-import com.example.demo.model.server.Server;
+import com.example.demo.model.enums.MessageType;
+import com.example.demo.model.room.Room;
 
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "rooms")
-public class Room {
+public class Message {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
   @Column(nullable = false)
-  private String name;
+  private String text;
 
   @Column(nullable = false)
-  private RoomType type;
-
-  @OneToMany(mappedBy = "room")
-  private List<Message> messages;
-
-  // Many rooms belong to one server
-  @ManyToOne
-  @JoinColumn(name = "server_id", nullable = false)
-  private Server server;
+  private MessageType type;
 
   @ManyToOne
-  @JoinColumn(name = "created_by", nullable = false)
-  private User createdBy;
+  @JoinColumn(name = "room_id", nullable = false)
+  private Room room;
+
+  @ManyToOne
+  @JoinColumn(name = "author", nullable = false)
+  private User author;
 
   @Temporal(TemporalType.TIMESTAMP)
   @Column(nullable = false, updatable = false)
@@ -45,21 +37,18 @@ public class Room {
   @Column(nullable = false)
   private Date dateUpdated;
 
-  public Room() {
+
+  public Message() {
 
   }
 
-  public Room(String name, User user, Server server, RoomType type) {
-    this.name = name;
-    this.server = server;
-    this.createdBy = user;
+  public Message(String text, MessageType type, Room room, User author) {
+    this.text = text;
     this.type = type;
+    this.room = room;
+    this.author = author;
     this.dateCreated = new Date();
     this.dateUpdated = new Date();
-  }
-
-  public Long getId() {
-    return id;
   }
 
   @PrePersist // This method is called before the entity is persisted (inserted) into the
@@ -74,5 +63,5 @@ public class Room {
   protected void onUpdate() {
     dateUpdated = new Date(); // Update dateUpdated whenever the entity is updated
   }
-
+  
 }
