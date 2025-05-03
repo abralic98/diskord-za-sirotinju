@@ -2,6 +2,7 @@
 package com.example.demo.controller.auth;
 
 import com.example.demo.config.JwtUtil;
+import com.example.demo.controller.global.ModifiedException;
 import com.example.demo.controller.inputs.user.CreateSessionInput;
 import com.example.demo.model.User;
 import com.example.demo.model.UserWithToken;
@@ -48,6 +49,6 @@ public class AuthController {
       return userWithToken;
     }
 
-    throw new RuntimeException("Invalid credentials");
+    throw new ModifiedException("Invalid credentials");
   }
 }
