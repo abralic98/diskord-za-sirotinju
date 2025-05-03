@@ -35,9 +35,12 @@ public class AuthController {
     String password = credentials.getPassword();
 
     // Validate the credentials
-    User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User Not Found"));
+    User user = userRepository.findByUsername(username).orElseThrow(() -> new ModifiedException("User Not Found"));
     System.out.println("u mog str");
     Boolean isPasswordCorrect = passwordEncoder.matches(password, user.getPassword());
+    if (!isPasswordCorrect) {
+      throw new ModifiedException("Invalid credentials");
+    }
     if (user != null && isPasswordCorrect) {
       String token = jwtUtil.generateToken(username);
 
