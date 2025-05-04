@@ -26,14 +26,24 @@ public class UserService {
   }
 
   // Create a new user
+
   public User createUser(CreateUserInput user) {
     String encodedPassword = passwordEncoder.encode(user.getPassword());
-    User newUser = new User(user.getUsername(), encodedPassword , user.getEmail()); // Create
 
+    userRepository.findByUsername(user.getUsername())
+        .ifPresent(u -> {
+          throw new ModifiedException("Username is already taken");
+        });
+
+    userRepository.findByEmail(user.getEmail())
+        .ifPresent(u -> {
+          throw new ModifiedException("Email is already taken");
+        });
+
+    User newUser = new User(user.getUsername(), encodedPassword, user.getEmail());
     return userRepository.save(newUser);
   }
 
-  // Get a user by their ID
   public Optional<User> getUserById(Long id) {
     EndpointProtector.checkAuth();
     try {
@@ -42,16 +52,13 @@ public class UserService {
       return user;
 
     } catch (Exception e) {
-      System.out.println("excepcija");
       return null;
     }
-    // return userRepository.findById(id);
   }
 
-  // Get all users (optional, if needed)
   public Iterable<User> getAllUsers() {
     EndpointProtector.checkAuth();
-    return userRepository.findAll(); // Get all users from DB
+    return userRepository.findAll(); 
   }
 
   public User deactivateUser(Long id) {
