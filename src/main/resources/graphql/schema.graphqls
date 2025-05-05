@@ -2,6 +2,7 @@ type Query {
   getAllUsers: [User]
   getUserById(id: ID!): User
   getAllServers: [Server]
+  getRoomsByServerId(id: ID!): [Room]
 }
 
 type Mutation {
@@ -16,9 +17,9 @@ type Mutation {
 # USERS ##############################
 
 type User {
-  id: ID!
-  username: String!
-  email: String!
+  id: ID
+  username: String
+  email: String
 }
 
 type UserWithToken {
@@ -42,11 +43,11 @@ input CreateSessionInput {
 #### SERVERS & ROOMS #################
 
 type Server {
-  id: ID!
-  name: String!
+  id: ID
+  name: String
   rooms: [Room]
   users: [User]
-  createdBy: User!
+  createdBy: User
 }
 
 type Room {
@@ -55,8 +56,8 @@ type Room {
   maxLimit: Int
   type: RoomType
   messages: [Message]
-  server: Server!
-  createdBy: User!
+  server: Server
+  createdBy: User
 }
 
 enum RoomType {
@@ -65,8 +66,8 @@ enum RoomType {
 }
 
 type Message {
-  author: User!
-  text: String!
+  author: User
+  text: String
   imgPath: String
 }
 
