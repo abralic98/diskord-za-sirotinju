@@ -2,7 +2,12 @@
 package com.example.demo.model;
 
 import jakarta.persistence.*;
+
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+
+import com.example.demo.model.server.Server;
 
 @Entity
 @Table(name = "users")
@@ -23,6 +28,9 @@ public class User {
 
   @Column(nullable = false)
   private Boolean active;
+
+  @ManyToMany(mappedBy = "joinedUsers")
+  private List<Server> joinedServers = new ArrayList<>();
 
   @Temporal(TemporalType.TIMESTAMP)
   @Column(nullable = false, updatable = false)

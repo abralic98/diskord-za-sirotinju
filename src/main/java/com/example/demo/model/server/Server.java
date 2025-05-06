@@ -2,6 +2,8 @@ package com.example.demo.model.server;
 
 import jakarta.persistence.*;
 import jakarta.persistence.Table;
+
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -23,10 +25,17 @@ public class Server {
   @OneToMany(mappedBy = "server", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Room> rooms;
 
+  @Column(nullable = false)
+  private Boolean publicServer;
+
   // Many servers can be created by one user
   @ManyToOne
   @JoinColumn(name = "created_by", nullable = false)
   private User createdBy;
+
+  @ManyToMany
+  @JoinTable(name = "server_users", joinColumns = @JoinColumn(name = "server_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
+  private List<User> joinedUsers = new ArrayList<>();
 
   @Temporal(TemporalType.TIMESTAMP)
   @Column(nullable = false, updatable = false)
@@ -41,9 +50,12 @@ public class Server {
 
   }
 
-  public Server(String name, User createdBy) {
+  public Server(String name, User createdBy, Boolean publicServer) {
     this.name = name;
     this.createdBy = createdBy;
+    this.publicServer = publicServer;
+    this.joinedUsers = new ArrayList<>();
+    this.joinedUsers.add(createdBy);
     this.dateCreated = new Date();
     this.dateUpdated = new Date();
   }
@@ -90,6 +102,22 @@ public class Server {
 
   public void setCreatedBy(User createdBy) {
     this.createdBy = createdBy;
+  }
+
+  public List<User> getJoinedUsers() {
+    return joinedUsers;
+  }
+
+  public void setJoinedUsers(List<User> joinedUsers) {
+    this.joinedUsers = joinedUsers;
+  }
+
+  public boolean getIsPublicServer() {
+    return publicServer;
+  }
+
+  public void setIsPublicServer(Boolean isPublic) {
+    this.publicServer = isPublic;
   }
 
   @PrePersist // This method is called before the entity is persisted (inserted) into the

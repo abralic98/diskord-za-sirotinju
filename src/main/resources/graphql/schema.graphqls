@@ -48,6 +48,7 @@ type Server {
   rooms: [Room]
   users: [User]
   createdBy: User
+  publicServer: Boolean
 }
 
 type Room {
@@ -66,6 +67,7 @@ enum RoomType {
 }
 
 type Message {
+  id: ID
   author: User
   text: String
   imgPath: String
@@ -78,6 +80,7 @@ enum MessageType {
 
 input CreateServerInput {
   name: String!
+  publicServer: Boolean!
 }
 
 input CreateRoomInput {

@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service 
+@Service
 public class ServerService {
 
   private final ServerRepository serverRepository;
@@ -26,13 +26,14 @@ public class ServerService {
   public Server createServer(CreateServerInput serverInput) {
     EndpointProtector.checkAuth();
     User user = currentAuthenticatedUser.getUser();
-    Server newServer = new Server(serverInput.getName(), user); 
+    Server newServer = new Server(serverInput.getName(), user, serverInput.getPublicServer());
     return serverRepository.save(newServer);
   }
 
   public List<Server> getAllServers() {
     EndpointProtector.checkAuth();
-    return serverRepository.findAll();
+    User user = currentAuthenticatedUser.getUser();
+    return serverRepository.findByJoinedUsersContaining(user);
   }
 
   // Get a user by their ID
