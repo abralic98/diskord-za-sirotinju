@@ -22,7 +22,7 @@ public class Server {
   private String name;
 
   // One server has many rooms
-  @OneToMany(mappedBy = "server", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = "server")
   private List<Room> rooms;
 
   @Column(nullable = false)

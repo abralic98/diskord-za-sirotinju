@@ -46,9 +46,9 @@ public class MessageService {
     return messageRepository.save(message);
   }
 
-  public List<Room> getRoomsByServerId(Long id) {
+  public List<Message> getMessagesByRoomId(Long id) {
     EndpointProtector.checkAuth();
-    List<Room> rooms = roomRepository.findByServerId(id);
-    return rooms;
+    List<Message> messages = messageRepository.findByRoomId(id);
+    return messages;
   }
 }

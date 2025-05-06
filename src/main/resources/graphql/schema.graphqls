@@ -3,6 +3,9 @@ type Query {
   getUserById(id: ID!): User
   getAllServers: [Server]
   getRoomsByServerId(id: ID!): [Room]
+  getMessagesByRoomId(id: ID!): [Message]
+  getRoomById(id: ID!): Room
+  getUsersByServerId(id: ID!): [User]
 }
 
 type Mutation {
@@ -71,6 +74,7 @@ type Message {
   author: User
   text: String
   imgPath: String
+  type: MessageType
 }
 
 enum MessageType {

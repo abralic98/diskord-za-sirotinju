@@ -36,6 +36,11 @@ public class ServerService {
     return serverRepository.findByJoinedUsersContaining(user);
   }
 
-  // Get a user by their ID
+  public List<User> getUsersByServerId(Long id) {
+    EndpointProtector.checkAuth(); 
+    return serverRepository.findById(id)
+        .map(Server::getJoinedUsers)
+        .orElseThrow(() -> new RuntimeException("Server not found"));
+  }
 
 }

@@ -10,6 +10,7 @@ import com.example.demo.model.room.Room;
 import com.example.demo.service.room.RoomService;
 
 import java.util.List;
+import java.util.Optional;
 
 @Controller 
 public class RoomController {
@@ -29,16 +30,10 @@ public class RoomController {
   public List<Room> getRoomsByServerId(@Argument Long id) {
     return roomService.getRoomsByServerId(id);
   }
-  // GraphQL query for getting a user by their ID
-  // @QueryMapping
-  // public Optional<User> getServerById(@Argument Long id) {
-  // return userService.getUserById(id); // Fetch user by ID from the service
-  // }
-  //
-  //
-  // @MutationMapping
-  // public User deactivateUser(@Argument Long id) {
-  // return userService.deactivateUser(id); // Create a user via the service
-  // }
+
+  @QueryMapping
+  public Optional<Room> getRoomById(@Argument Long id) {
+    return roomService.getRoomById(id);
+  }
 
 }

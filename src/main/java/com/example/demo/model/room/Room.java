@@ -62,6 +62,14 @@ public class Room {
     return id;
   }
 
+  public List<Message> getMessages() {
+    return messages;
+  }
+
+  public void setMessages(List<Message> messages) {
+    this.messages = messages;
+  }
+
   @PrePersist // This method is called before the entity is persisted (inserted) into the
               // database, ensuring that dateCreated is set when a new user is created.
   protected void onCreate() {
