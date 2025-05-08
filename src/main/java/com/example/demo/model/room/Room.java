@@ -70,6 +70,11 @@ public class Room {
     this.messages = messages;
   }
 
+  public Server getServer() {
+    return server;
+  }
+
+
   @PrePersist // This method is called before the entity is persisted (inserted) into the
               // database, ensuring that dateCreated is set when a new user is created.
   protected void onCreate() {

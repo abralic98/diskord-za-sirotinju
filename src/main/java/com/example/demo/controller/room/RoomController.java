@@ -10,9 +10,8 @@ import com.example.demo.model.room.Room;
 import com.example.demo.service.room.RoomService;
 
 import java.util.List;
-import java.util.Optional;
 
-@Controller 
+@Controller
 public class RoomController {
 
   private final RoomService roomService;
@@ -32,7 +31,7 @@ public class RoomController {
   }
 
   @QueryMapping
-  public Optional<Room> getRoomById(@Argument Long id) {
+  public Room getRoomById(@Argument Long id) {
     return roomService.getRoomById(id);
   }
 

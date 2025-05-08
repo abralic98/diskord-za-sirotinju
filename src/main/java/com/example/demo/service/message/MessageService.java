@@ -1,16 +1,22 @@
 package com.example.demo.service.message;
 
-import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.config.EndpointProtector;
 import com.example.demo.controller.inputs.message.CreateMessageInput;
+import com.example.demo.dto.message.MessagePageDTO;
 import com.example.demo.helpers.CurrentAuthenticatedUser;
 import com.example.demo.model.User;
 import com.example.demo.model.message.Message;
 import com.example.demo.model.room.Room;
+import com.example.demo.model.server.Server;
+import com.example.demo.controller.global.ModifiedException;
 import com.example.demo.repository.MessageRepository;
 import com.example.demo.repository.RoomRepository;
 
@@ -28,16 +34,6 @@ public class MessageService {
     this.currentAuthenticatedUser = currentAuthenticatedUser;
   }
 
-  public Optional<Room> getRoomById(Long id) {
-    EndpointProtector.checkAuth();
-    try {
-      Optional<Room> room = roomRepository.findById(id);
-      return room;
-    } catch (Exception e) {
-      return null;
-    }
-  }
-
   public Message createMessage(CreateMessageInput input) {
     EndpointProtector.checkAuth();
     User user = currentAuthenticatedUser.getUser();
@@ -46,9 +42,20 @@ public class MessageService {
     return messageRepository.save(message);
   }
 
-  public List<Message> getMessagesByRoomId(Long id) {
+  public MessagePageDTO getMessagesByRoomId(Long roomId, int page, int size) {
     EndpointProtector.checkAuth();
-    List<Message> messages = messageRepository.findByRoomId(id);
-    return messages;
+    User user = currentAuthenticatedUser.getUser();
+
+    Room room = roomRepository.findById(roomId).orElseThrow(() -> new ModifiedException(("Room not found")));
+    Server server = room.getServer();
+
+    if (!server.getJoinedUsers().contains(user)) {
+        throw new ModifiedException("Access denied: user has not joined the server");
+    }
+
+    Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "dateCreated"));
+    Page<Message> messagePage = messageRepository.findByRoomId(roomId, pageable);
+    return new MessagePageDTO(messagePage);
   }
+
 }

@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.config.EndpointProtector;
+import com.example.demo.controller.global.ModifiedException;
 import com.example.demo.controller.inputs.room.CreateRoomInput;
 import com.example.demo.helpers.CurrentAuthenticatedUser;
 import com.example.demo.model.User;
@@ -28,14 +29,18 @@ public class RoomService {
     this.serverRepository = serverRepository;
   }
 
-  public Optional<Room> getRoomById(Long id) {
+  public Room getRoomById(Long id) {
     EndpointProtector.checkAuth();
-    try {
-      Optional<Room> room = roomRepository.findById(id);
-      return room;
-    } catch (Exception e) {
-      return null;
+    User user = currentAuthenticatedUser.getUser();
+
+    Room room = roomRepository.findById(id).orElseThrow(() -> new ModifiedException(("Room not found")));
+    Server server = room.getServer();
+
+    if (!server.getJoinedUsers().contains(user)) {
+      throw new ModifiedException("Access denied: user has not joined this server");
     }
+
+    return room;
   }
 
   public Room createRoom(CreateRoomInput input) {
@@ -49,6 +54,11 @@ public class RoomService {
 
   public List<Room> getRoomsByServerId(Long id) {
     EndpointProtector.checkAuth();
+    User user = currentAuthenticatedUser.getUser();
+    Server server = serverRepository.findById(id).orElseThrow(() -> new ModifiedException("Server not found"));
+    if (!server.getJoinedUsers().contains(user)) {
+      throw new ModifiedException("Access denied: user has not joined this server");
+    }
     List<Room> rooms = roomRepository.findByServerId(id);
     return rooms;
   }

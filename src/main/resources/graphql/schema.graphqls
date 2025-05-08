@@ -3,7 +3,8 @@ type Query {
   getUserById(id: ID!): User
   getAllServers: [Server]
   getRoomsByServerId(id: ID!): [Room]
-  getMessagesByRoomId(id: ID!): [Message]
+  # getMessagesByRoomId(id: ID!): [Message]
+  getMessagesByRoomId(id: ID!, page: Int!, size: Int!): MessagePage!
   getRoomById(id: ID!): Room
   getUsersByServerId(id: ID!): [User]
 }
@@ -75,6 +76,16 @@ type Message {
   text: String
   imgPath: String
   type: MessageType
+  dateCreated: String
+  dateUpdated: String
+}
+
+type MessagePage {
+  content: [Message!]!
+  totalPages: Int!
+  totalElements: Int!
+  number: Int!
+  size: Int!
 }
 
 enum MessageType {

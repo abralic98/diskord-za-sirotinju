@@ -7,6 +7,7 @@ import com.example.demo.helpers.CurrentAuthenticatedUser;
 import com.example.demo.model.User;
 import com.example.demo.model.server.Server;
 import com.example.demo.repository.ServerRepository;
+import com.example.demo.controller.global.ModifiedException;
 
 import org.springframework.stereotype.Service;
 
@@ -37,10 +38,17 @@ public class ServerService {
   }
 
   public List<User> getUsersByServerId(Long id) {
-    EndpointProtector.checkAuth(); 
-    return serverRepository.findById(id)
-        .map(Server::getJoinedUsers)
-        .orElseThrow(() -> new RuntimeException("Server not found"));
+    EndpointProtector.checkAuth();
+    User user = currentAuthenticatedUser.getUser();
+
+    Server server = serverRepository.findById(id)
+        .orElseThrow(() -> new ModifiedException("Server not found"));
+
+    if (!server.getJoinedUsers().contains(user)) {
+      throw new ModifiedException("Access denied: user has not joined this server");
+    }
+
+    return server.getJoinedUsers();
   }
 
 }
