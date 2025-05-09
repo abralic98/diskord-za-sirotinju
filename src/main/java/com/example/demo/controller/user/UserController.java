@@ -2,7 +2,7 @@
 // U KONTROLERU PISEMO KVERIJE 
 package com.example.demo.controller.user;
 
-import com.example.demo.controller.inputs.user.CreateUserInput;
+import com.example.demo.controller.inputs.user.*;
 import com.example.demo.model.User;
 import com.example.demo.service.user.UserService;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -43,10 +43,10 @@ public class UserController {
     return userService.createUser(user);
   }
 
-  @MutationMapping
-  public User updateUser(@Argument CreateUserInput user) {
-    return userService.createUser(user);
-  }
+  // @MutationMapping
+  // public User updateUser(@Argument UpdateUserInput user) {
+  //   return userService.updateUser(user);
+  // }
 
   @MutationMapping
   public User deactivateUser(@Argument Long id) {

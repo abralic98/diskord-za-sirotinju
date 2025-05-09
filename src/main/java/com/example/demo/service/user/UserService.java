@@ -4,7 +4,7 @@ package com.example.demo.service.user;
 
 import com.example.demo.config.EndpointProtector;
 import com.example.demo.controller.global.ModifiedException;
-import com.example.demo.controller.inputs.user.CreateUserInput;
+import com.example.demo.controller.inputs.user.*;
 import com.example.demo.helpers.CurrentAuthenticatedUser;
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
@@ -51,6 +51,22 @@ public class UserService {
     User newUser = new User(user.getUsername(), encodedPassword, user.getEmail());
     return userRepository.save(newUser);
   }
+
+  // public User updateUser(UpdateUserInput user) {
+  //   User currentUser = currentAuthenticatedUser.getUser();
+  //   // debilan nacin sa ifovima vjerovatno ima neki normalniji nacin
+  //   if (user.getUsername() != null) {
+  //     currentUser.setUsername(user.getUsername());
+  //   }
+  //   if (user.getEmail() != null) {
+  //     currentUser.setEmail(user.getEmail());
+  //   }
+  //   if (user.getPhoneNumber() != null) {
+  //     currentUser.setPhoneNumber(user.getPhoneNumber());
+  //   }
+  //
+  //   return userRepository.save(currentUser);
+  // }
 
   public Optional<User> getUserById(Long id) {
     EndpointProtector.checkAuth();
