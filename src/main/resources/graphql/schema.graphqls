@@ -15,6 +15,7 @@ type Query {
 type Mutation {
   createUser(user: CreateUserInput): User
   updateUser(user: UpdateUserInput): User
+  updateUserPassword(credentials: UpdateUserPasswordInput): User
   deactivateUser(id: ID): User
   createSession(credentials: CreateSessionInput): UserWithToken
   createServer(server: CreateServerInput): Server
@@ -51,6 +52,12 @@ input UpdateUserInput {
   username: String
   email: String
   phoneNumber: Long
+}
+
+input UpdateUserPasswordInput {
+  currentPassword: String!
+  newPassword: String!
+  confirmNewPassword: String!
 }
 
 ######################################

@@ -49,6 +49,11 @@ public class UserController {
   }
 
   @MutationMapping
+  public User updateUserPassword(@Argument UpdateUserPasswordInput credentials) {
+    return userService.updateUserPassword(credentials);
+  }
+
+  @MutationMapping
   public User deactivateUser(@Argument Long id) {
     return userService.deactivateUser(id);
   }

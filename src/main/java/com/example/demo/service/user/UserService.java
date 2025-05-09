@@ -12,6 +12,7 @@ import com.example.demo.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
 import java.util.Optional;
 
 @Service // Marks this class as a Spring service
@@ -66,7 +67,28 @@ public class UserService {
     }
 
     User updatedUser = userRepository.save(currentUser);
-    currentAuthenticatedUser.refreshAuthentication(updatedUser); 
+    currentAuthenticatedUser.refreshAuthentication(updatedUser);
+    return updatedUser;
+  }
+
+  public User updateUserPassword(UpdateUserPasswordInput credentials) {
+    User currentUser = currentAuthenticatedUser.getUser();
+
+    Boolean isPasswordCorrect = passwordEncoder.matches(credentials.getCurrentPassword(), currentUser.getPassword());
+    if (!isPasswordCorrect) {
+      throw new ModifiedException("Invalid current password");
+    }
+    if (!Objects.equals(credentials.getNewPassword(), credentials.getConfirmNewPassword())) {
+      throw new ModifiedException("Password and Confirm password must match!");
+    }
+    if (credentials.getNewPassword() == null) {
+      throw new ModifiedException("New password must not be null");
+    }
+
+    String encodedNewPassword = passwordEncoder.encode(credentials.getNewPassword());
+    currentUser.setPassword(encodedNewPassword);
+    User updatedUser = userRepository.save(currentUser);
+    currentAuthenticatedUser.refreshAuthentication(updatedUser);
     return updatedUser;
   }
 
