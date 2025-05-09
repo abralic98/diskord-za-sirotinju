@@ -74,6 +74,10 @@ public class Room {
     return server;
   }
 
+  public RoomType getType() {
+    return type;
+  }
+
 
   @PrePersist // This method is called before the entity is persisted (inserted) into the
               // database, ensuring that dateCreated is set when a new user is created.

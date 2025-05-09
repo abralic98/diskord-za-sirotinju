@@ -6,10 +6,9 @@ import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.stereotype.Controller;
 
 import com.example.demo.controller.inputs.room.CreateRoomInput;
+import com.example.demo.dto.rooms.Rooms;
 import com.example.demo.model.room.Room;
 import com.example.demo.service.room.RoomService;
-
-import java.util.List;
 
 @Controller
 public class RoomController {
@@ -26,7 +25,7 @@ public class RoomController {
   }
 
   @QueryMapping
-  public List<Room> getRoomsByServerId(@Argument Long id) {
+  public Rooms getRoomsByServerId(@Argument Long id) {
     return roomService.getRoomsByServerId(id);
   }
 

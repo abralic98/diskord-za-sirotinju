@@ -5,8 +5,7 @@ type Query {
   getAllUsers: [User]
   getUserById(id: ID!): User
   getAllServers: [Server]
-  getRoomsByServerId(id: ID!): [Room]
-  # getMessagesByRoomId(id: ID!): [Message]
+  getRoomsByServerId(id: ID!): Rooms
   getMessagesByRoomId(id: ID!, page: Int!, size: Int!): MessagePage!
   getRoomById(id: ID!): Room
   getUsersByServerId(id: ID!): [User]
@@ -86,6 +85,11 @@ type Room {
 enum RoomType {
   VOICE
   TEXT
+}
+
+type Rooms {
+  text: [Room]
+  voice: [Room]
 }
 
 type Message {

@@ -34,6 +34,7 @@ public class SecurityConfig {
             .requestMatchers("/auth/**").permitAll() // Allow login endpoint
             .requestMatchers("/graphql").permitAll() // GraphQL will check inside resolver
             .requestMatchers("/graphiql", "/vendor/**", "/static/**").permitAll() // GraphiQL frontend
+            .requestMatchers("/ws/**").permitAll() // Allow WebSocket endpoint without auth
             .anyRequest().authenticated()) // Require authentication for other requests
         .addFilterBefore(new JwtAuthenticationFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class); // Pass
                                                                                                             // JwtUtil
@@ -48,7 +49,7 @@ public class SecurityConfig {
   public UrlBasedCorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration corsConfig = new CorsConfiguration();
     corsConfig.setAllowedOrigins(Arrays.asList("http://localhost:3000")); // Frontend URL
-    corsConfig.setAllowedMethods(Arrays.asList("GET", "POST")); // Allowed HTTP methods
+    corsConfig.setAllowedMethods(Arrays.asList("GET", "POST", "OPTIONS")); // Allowed HTTP methods
     corsConfig.setAllowedHeaders(Arrays.asList("*")); // Allow all headers
     corsConfig.setAllowCredentials(true); // Allow credentials (cookies or authorization headers)
 
