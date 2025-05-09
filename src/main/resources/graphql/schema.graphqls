@@ -46,9 +46,8 @@ input CreateSessionInput {
 
 input UpdateUserInput {
   username: String
-  password: String
   email: String
-  phoneNumber: Number
+  phoneNumber: Int
 }
 
 ######################################

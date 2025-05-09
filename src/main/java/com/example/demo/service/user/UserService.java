@@ -52,21 +52,21 @@ public class UserService {
     return userRepository.save(newUser);
   }
 
-  // public User updateUser(UpdateUserInput user) {
-  //   User currentUser = currentAuthenticatedUser.getUser();
-  //   // debilan nacin sa ifovima vjerovatno ima neki normalniji nacin
-  //   if (user.getUsername() != null) {
-  //     currentUser.setUsername(user.getUsername());
-  //   }
-  //   if (user.getEmail() != null) {
-  //     currentUser.setEmail(user.getEmail());
-  //   }
-  //   if (user.getPhoneNumber() != null) {
-  //     currentUser.setPhoneNumber(user.getPhoneNumber());
-  //   }
-  //
-  //   return userRepository.save(currentUser);
-  // }
+  public User updateUser(UpdateUserInput user) {
+    User currentUser = currentAuthenticatedUser.getUser();
+    // debilan nacin sa ifovima vjerovatno ima neki normalniji nacin
+    if (user.getUsername() != null) {
+      currentUser.setUsername(user.getUsername());
+    }
+    if (user.getEmail() != null) {
+      currentUser.setEmail(user.getEmail());
+    }
+    if (user.getPhoneNumber() != null) {
+      currentUser.setPhoneNumber(user.getPhoneNumber());
+    }
+
+    return userRepository.save(currentUser);
+  }
 
   public Optional<User> getUserById(Long id) {
     EndpointProtector.checkAuth();

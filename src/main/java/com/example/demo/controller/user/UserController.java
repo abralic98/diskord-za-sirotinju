@@ -43,10 +43,10 @@ public class UserController {
     return userService.createUser(user);
   }
 
-  // @MutationMapping
-  // public User updateUser(@Argument UpdateUserInput user) {
-  //   return userService.updateUser(user);
-  // }
+  @MutationMapping
+  public User updateUser(@Argument UpdateUserInput user) {
+    return userService.updateUser(user);
+  }
 
   @MutationMapping
   public User deactivateUser(@Argument Long id) {
