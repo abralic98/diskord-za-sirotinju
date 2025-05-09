@@ -27,7 +27,7 @@ public class User {
   private String email;
 
   @Column(nullable = true)
-  private Number phoneNumber;
+  private Long phoneNumber;
 
   @Column(nullable = false)
   private Boolean active;
@@ -100,7 +100,7 @@ public class User {
     return dateCreated;
   }
 
-  public void setPhoneNumber(Number phoneNumber) {
+  public void setPhoneNumber(Long phoneNumber) {
     this.phoneNumber = phoneNumber;
   }
 

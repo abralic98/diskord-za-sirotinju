@@ -1,10 +1,12 @@
 package com.example.demo.helpers;
 
-import com.example.demo.model.User;
-import com.example.demo.repository.UserRepository;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+
+import com.example.demo.model.User;
+import com.example.demo.repository.UserRepository;
 
 @Component
 public class CurrentAuthenticatedUser {
@@ -21,8 +23,25 @@ public class CurrentAuthenticatedUser {
       throw new RuntimeException("No authenticated user found");
     }
 
-    String username = authentication.getName();
-    return userRepository.findByUsername(username)
+    Object principal = authentication.getPrincipal();
+    if (!(principal instanceof Long)) {
+      throw new RuntimeException("Invalid authentication principal");
+    }
+
+    Long userId = (Long) principal;
+    return userRepository.findById(userId)
         .orElseThrow(() -> new RuntimeException("User not found"));
+  }
+
+  public void refreshAuthentication(User updatedUser) {
+    Authentication currentAuth = SecurityContextHolder.getContext().getAuthentication();
+
+    Authentication newAuth = new UsernamePasswordAuthenticationToken(
+        updatedUser.getId(),  
+        currentAuth.getCredentials(),
+        currentAuth.getAuthorities()
+    );
+
+    SecurityContextHolder.getContext().setAuthentication(newAuth);
   }
 }

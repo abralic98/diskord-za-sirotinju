@@ -1,3 +1,5 @@
+scalar Long
+
 type Query {
   meQuery: User
   getAllUsers: [User]
@@ -26,6 +28,7 @@ type User {
   id: ID
   username: String
   email: String
+  phoneNumber: Long
 }
 
 type UserWithToken {
@@ -47,7 +50,7 @@ input CreateSessionInput {
 input UpdateUserInput {
   username: String
   email: String
-  phoneNumber: Int
+  phoneNumber: Long
 }
 
 ######################################

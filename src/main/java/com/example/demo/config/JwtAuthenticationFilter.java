@@ -33,8 +33,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       String token = authHeader.substring(7);
       if (jwtUtil.validateToken(token)) {
         String username = jwtUtil.extractUsername(token);
+        Long userId = jwtUtil.extractUserId(token); // Assuming you add a method to extract the user ID from the token
 
-        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(username, null,
+        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userId, null,
             Collections.emptyList());
 
         authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

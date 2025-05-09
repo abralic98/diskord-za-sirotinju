@@ -65,7 +65,9 @@ public class UserService {
       currentUser.setPhoneNumber(user.getPhoneNumber());
     }
 
-    return userRepository.save(currentUser);
+    User updatedUser = userRepository.save(currentUser);
+    currentAuthenticatedUser.refreshAuthentication(updatedUser); 
+    return updatedUser;
   }
 
   public Optional<User> getUserById(Long id) {

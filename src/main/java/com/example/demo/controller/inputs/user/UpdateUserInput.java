@@ -2,9 +2,8 @@ package com.example.demo.controller.inputs.user;
 
 public class UpdateUserInput {
   private String username;
-  private String password;
   private String email;
-  private Number phoneNumber;
+  private Long phoneNumber;
 
   // Getters and setters
   public String getUsername() {
@@ -23,11 +22,11 @@ public class UpdateUserInput {
     this.email = email;
   }
 
-  public Number getPhoneNumber() {
+  public Long getPhoneNumber() {
     return phoneNumber;
   }
 
-  public void setPhoneNumber(Number phoneNumber) {
+  public void setPhoneNumber(Long phoneNumber) {
     this.phoneNumber = phoneNumber;
   }
 

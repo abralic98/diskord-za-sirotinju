@@ -42,7 +42,7 @@ public class AuthController {
       throw new ModifiedException("Invalid credentials");
     }
     if (user != null && isPasswordCorrect) {
-      String token = jwtUtil.generateToken(username);
+      String token = jwtUtil.generateToken(username, user.getId());
 
       // Return UserWithToken containing both user and token
       UserWithToken userWithToken = new UserWithToken();
