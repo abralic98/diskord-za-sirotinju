@@ -1,4 +1,5 @@
 type Query {
+  meQuery: User
   getAllUsers: [User]
   getUserById(id: ID!): User
   getAllServers: [Server]

@@ -26,6 +26,9 @@ public class User {
   @Column(nullable = false, unique = true)
   private String email;
 
+  @Column(nullable = true)
+  private Number phoneNumber;
+
   @Column(nullable = false)
   private Boolean active;
 
@@ -95,6 +98,14 @@ public class User {
 
   public Date getDateCreated() {
     return dateCreated;
+  }
+
+  public void setPhoneNumber(Number phoneNumber) {
+    this.phoneNumber = phoneNumber;
+  }
+
+  public Number getPhoneNumber() {
+    return phoneNumber;
   }
 
   public void setDateCreated(Date dateCreated) {

@@ -5,6 +5,7 @@ package com.example.demo.service.user;
 import com.example.demo.config.EndpointProtector;
 import com.example.demo.controller.global.ModifiedException;
 import com.example.demo.controller.inputs.user.CreateUserInput;
+import com.example.demo.helpers.CurrentAuthenticatedUser;
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
 
@@ -18,14 +19,21 @@ public class UserService {
 
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
+  private final CurrentAuthenticatedUser currentAuthenticatedUser;
 
   // Constructor-based dependency injection
-  public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+  public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder,
+      CurrentAuthenticatedUser currentAuthenticatedUser) {
     this.userRepository = userRepository;
     this.passwordEncoder = passwordEncoder;
+    this.currentAuthenticatedUser = currentAuthenticatedUser;
   }
 
-  // Create a new user
+  public User getMe() {
+    EndpointProtector.checkAuth();
+    User user = currentAuthenticatedUser.getUser();
+    return user;
+  }
 
   public User createUser(CreateUserInput user) {
     String encodedPassword = passwordEncoder.encode(user.getPassword());
@@ -58,7 +66,7 @@ public class UserService {
 
   public Iterable<User> getAllUsers() {
     EndpointProtector.checkAuth();
-    return userRepository.findAll(); 
+    return userRepository.findAll();
   }
 
   public User deactivateUser(Long id) {
