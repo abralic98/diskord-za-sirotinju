@@ -1,12 +1,14 @@
-
 package com.example.demo.websocket;
 
+import com.example.demo.model.User;
+import com.example.demo.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.web.socket.*;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 public class VoiceWebSocketHandler extends TextWebSocketHandler {
 
@@ -14,6 +16,12 @@ public class VoiceWebSocketHandler extends TextWebSocketHandler {
   private final Map<WebSocketSession, String> sessionUserMap = new ConcurrentHashMap<>();
   private final Map<String, String> userRoomMap = new ConcurrentHashMap<>();
   private final ObjectMapper mapper = new ObjectMapper();
+  private final UserRepository userRepository; // Add this
+
+  // Add constructor to inject UserRepository
+  public VoiceWebSocketHandler(UserRepository userRepository) {
+    this.userRepository = userRepository;
+  }
 
   @Override
   public void afterConnectionEstablished(WebSocketSession session) {
@@ -49,12 +57,9 @@ public class VoiceWebSocketHandler extends TextWebSocketHandler {
 
     switch (type) {
       case "getPresence":
-        // Immediately send presence for the requested room
         broadcastPresence(room);
         break;
-
       case "join":
-        // Remove from all rooms first
         rooms.forEach((r, sessions) -> {
           if (sessions.remove(session)) {
             broadcastPresence(r);
@@ -66,7 +71,6 @@ public class VoiceWebSocketHandler extends TextWebSocketHandler {
           broadcastPresence(room);
         }
         break;
-
       case "offer":
       case "answer":
       case "candidate":
@@ -95,7 +99,6 @@ public class VoiceWebSocketHandler extends TextWebSocketHandler {
 
   private void broadcastPresence(String roomId) {
     if ("all".equals(roomId)) {
-      // Special case: send presence for all rooms
       rooms.keySet().forEach(this::sendRoomPresence);
     } else {
       sendRoomPresence(roomId);
@@ -104,22 +107,32 @@ public class VoiceWebSocketHandler extends TextWebSocketHandler {
 
   private void sendRoomPresence(String roomId) {
     List<WebSocketSession> peers = rooms.getOrDefault(roomId, Collections.emptyList());
-    List<String> userIds = new ArrayList<>();
 
-    for (WebSocketSession peer : peers) {
-      String uid = sessionUserMap.get(peer);
-      if (uid != null)
-        userIds.add(uid);
-    }
+    // Create a list of user details instead of just IDs
+    List<Map<String, Object>> userDetails = peers.stream()
+        .map(sessionUserMap::get)
+        .filter(Objects::nonNull)
+        .map(userId -> {
+          User user = userRepository.findById(Long.parseLong(userId)).orElse(null);
+          if (user != null) {
+            Map<String, Object> details = new HashMap<>();
+            details.put("id", userId);
+            details.put("username", user.getUsername());
+            details.put("avatar", user.getAvatar());
+            return details;
+          }
+          return null;
+        })
+        .filter(Objects::nonNull)
+        .collect(Collectors.toList());
 
     Map<String, Object> payload = new HashMap<>();
     payload.put("type", "presence");
     payload.put("room", roomId);
-    payload.put("users", userIds);
+    payload.put("users", userDetails);
 
     try {
       String json = mapper.writeValueAsString(payload);
-      // Send to ALL connected clients, not just room members
       for (WebSocketSession session : sessionUserMap.keySet()) {
         if (session.isOpen()) {
           session.sendMessage(new TextMessage(json));

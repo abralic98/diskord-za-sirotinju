@@ -32,6 +32,9 @@ public class User {
   @Column(nullable = false)
   private Boolean active;
 
+  @Column(nullable = true)
+  private String avatar;
+
   @ManyToMany(mappedBy = "joinedUsers")
   private List<Server> joinedServers = new ArrayList<>();
 
@@ -86,6 +89,14 @@ public class User {
 
   public void setEmail(String email) {
     this.email = email;
+  }
+
+  public String getAvatar() {
+    return avatar;
+  }
+
+  public void setAvatar(String avatar) {
+    this.avatar = avatar;
   }
 
   public Boolean getIsUserActive() {
