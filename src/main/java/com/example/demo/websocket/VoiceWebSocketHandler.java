@@ -18,84 +18,115 @@ public class VoiceWebSocketHandler extends TextWebSocketHandler {
   @Override
   public void afterConnectionEstablished(WebSocketSession session) {
     System.out.println("🟢 Connected: " + session.getId());
+    sessionUserMap.put(session, "temp"); // Temporary placeholder
+    // Send current presence for all rooms
+    rooms.forEach((roomId, peers) -> {
+      if (peers.contains(session)) {
+        broadcastPresence(roomId);
+      }
+    });
   }
 
   @Override
   protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-    System.out.println("📨 Received: " + message.getPayload());
     Map<String, Object> data = mapper.readValue(message.getPayload(), Map.class);
     String type = (String) data.get("type");
     String room = (String) data.get("room");
 
-    if (room == null)
+    if (room == null || type == null)
       return;
 
-    // Extract user ID from sender object
     Map<String, Object> sender = (Map<String, Object>) data.get("sender");
     String userId = (String) sender.get("id");
-
     if (userId == null)
       return;
 
-    // Remove session from all rooms
-    rooms.forEach((r, sessions) -> sessions.remove(session));
-
-    // Add session to the new room
-    rooms.computeIfAbsent(room, k -> new ArrayList<>());
-    if (!rooms.get(room).contains(session)) {
-      rooms.get(room).add(session);
-    }
-
-    // Associate session with user ID
     sessionUserMap.put(session, userId);
+    userRoomMap.put(userId, room);
 
-    // Send updated user list to everyone in the room
-    broadcastUserList(room);
+    rooms.computeIfAbsent(room, k -> new ArrayList<>());
+    List<WebSocketSession> peers = rooms.get(room);
 
-    // Forward message to all others in the room
-    for (WebSocketSession peer : rooms.get(room)) {
-      if (!peer.equals(session) && peer.isOpen()) {
-        peer.sendMessage(message);
-      }
+    switch (type) {
+      case "getPresence":
+        // Immediately send presence for the requested room
+        broadcastPresence(room);
+        break;
+
+      case "join":
+        // Remove from all rooms first
+        rooms.forEach((r, sessions) -> {
+          if (sessions.remove(session)) {
+            broadcastPresence(r);
+          }
+        });
+
+        if (!peers.contains(session)) {
+          peers.add(session);
+          broadcastPresence(room);
+        }
+        break;
+
+      case "offer":
+      case "answer":
+      case "candidate":
+        for (WebSocketSession peer : peers) {
+          if (!peer.equals(session) && peer.isOpen()) {
+            peer.sendMessage(new TextMessage(mapper.writeValueAsString(data)));
+          }
+        }
+        break;
     }
   }
 
   @Override
-  public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-    System.out.println("🔴 Closed: " + session.getId());
+  public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
+    System.out.println("🔴 Disconnected: " + session.getId());
 
-    sessionUserMap.remove(session);
-
-    for (Map.Entry<String, List<WebSocketSession>> entry : rooms.entrySet()) {
-      String room = entry.getKey();
-      List<WebSocketSession> sessions = entry.getValue();
-
-      if (sessions.remove(session)) {
-        broadcastUserList(room);
-        break;
+    String userId = sessionUserMap.remove(session);
+    if (userId != null) {
+      String room = userRoomMap.remove(userId);
+      if (room != null) {
+        rooms.getOrDefault(room, Collections.emptyList()).remove(session);
+        broadcastPresence(room);
       }
     }
   }
 
-  private void broadcastUserList(String room) throws Exception {
-    List<WebSocketSession> sessions = rooms.getOrDefault(room, new ArrayList<>());
+  private void broadcastPresence(String roomId) {
+    if ("all".equals(roomId)) {
+      // Special case: send presence for all rooms
+      rooms.keySet().forEach(this::sendRoomPresence);
+    } else {
+      sendRoomPresence(roomId);
+    }
+  }
 
+  private void sendRoomPresence(String roomId) {
+    List<WebSocketSession> peers = rooms.getOrDefault(roomId, Collections.emptyList());
     List<String> userIds = new ArrayList<>();
-    for (WebSocketSession s : sessions) {
-      String uid = sessionUserMap.get(s);
+
+    for (WebSocketSession peer : peers) {
+      String uid = sessionUserMap.get(peer);
       if (uid != null)
         userIds.add(uid);
     }
 
-    Map<String, Object> response = new HashMap<>();
-    response.put("type", "user-list");
-    response.put("users", userIds);
-    String msg = mapper.writeValueAsString(response);
+    Map<String, Object> payload = new HashMap<>();
+    payload.put("type", "presence");
+    payload.put("room", roomId);
+    payload.put("users", userIds);
 
-    for (WebSocketSession s : sessions) {
-      if (s.isOpen()) {
-        s.sendMessage(new TextMessage(msg));
+    try {
+      String json = mapper.writeValueAsString(payload);
+      // Send to ALL connected clients, not just room members
+      for (WebSocketSession session : sessionUserMap.keySet()) {
+        if (session.isOpen()) {
+          session.sendMessage(new TextMessage(json));
+        }
       }
+    } catch (Exception e) {
+      e.printStackTrace();
     }
   }
 }
