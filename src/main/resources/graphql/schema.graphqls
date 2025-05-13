@@ -29,6 +29,7 @@ type User {
   username: String
   email: String
   phoneNumber: Long
+  avatar: String
 }
 
 type UserWithToken {
@@ -51,6 +52,7 @@ input UpdateUserInput {
   username: String
   email: String
   phoneNumber: Long
+  avatar: String
 }
 
 input UpdateUserPasswordInput {

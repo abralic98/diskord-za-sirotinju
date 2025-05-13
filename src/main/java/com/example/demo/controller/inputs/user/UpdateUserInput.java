@@ -4,6 +4,7 @@ public class UpdateUserInput {
   private String username;
   private String email;
   private Long phoneNumber;
+  private String avatar;
 
   // Getters and setters
   public String getUsername() {
@@ -28,6 +29,14 @@ public class UpdateUserInput {
 
   public void setPhoneNumber(Long phoneNumber) {
     this.phoneNumber = phoneNumber;
+  }
+
+  public String getAvatar() {
+    return avatar;
+  }
+
+  public void setAvatar(String avatar) {
+    this.avatar = avatar;
   }
 
 }

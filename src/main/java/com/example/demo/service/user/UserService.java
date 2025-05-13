@@ -65,6 +65,9 @@ public class UserService {
     if (user.getPhoneNumber() != null) {
       currentUser.setPhoneNumber(user.getPhoneNumber());
     }
+    if (user.getAvatar() != null) {
+      currentUser.setAvatar(user.getAvatar());
+    }
 
     User updatedUser = userRepository.save(currentUser);
     currentAuthenticatedUser.refreshAuthentication(updatedUser);
