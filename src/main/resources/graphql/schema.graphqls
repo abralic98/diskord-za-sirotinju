@@ -4,11 +4,12 @@ type Query {
   meQuery: User
   getAllUsers: [User]
   getUserById(id: ID!): User
-  getAllServers: [Server]
+  getAllServers(page: Int!, size: Int!): ServerPage!
+  getAllUserServers: [Server]
   getRoomsByServerId(id: ID!): Rooms
   getMessagesByRoomId(id: ID!, page: Int!, size: Int!): MessagePage!
   getRoomById(id: ID!): Room
-  getUsersByServerId(id: ID!): [User]
+  getServerById(id: ID!): Server
 }
 
 type Mutation {
@@ -69,9 +70,17 @@ type Server {
   id: ID
   name: String
   rooms: [Room]
-  users: [User]
+  joinedUsers: [User]
   createdBy: User
   publicServer: Boolean
+}
+
+type ServerPage {
+  content: [Server!]!
+  totalPages: Int!
+  totalElements: Int!
+  number: Int!
+  size: Int!
 }
 
 type Room {

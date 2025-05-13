@@ -3,12 +3,17 @@ package com.example.demo.service.server;
 
 import com.example.demo.config.EndpointProtector;
 import com.example.demo.controller.inputs.server.CreateServerInput;
+import com.example.demo.dto.server.ServerPageDTO;
 import com.example.demo.helpers.CurrentAuthenticatedUser;
 import com.example.demo.model.User;
 import com.example.demo.model.server.Server;
 import com.example.demo.repository.ServerRepository;
 import com.example.demo.controller.global.ModifiedException;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,13 +36,20 @@ public class ServerService {
     return serverRepository.save(newServer);
   }
 
-  public List<Server> getAllServers() {
+  public List<Server> getAllUserServers() {
     EndpointProtector.checkAuth();
     User user = currentAuthenticatedUser.getUser();
     return serverRepository.findByJoinedUsersContaining(user);
   }
 
-  public List<User> getUsersByServerId(Long id) {
+  public ServerPageDTO getAllServers(int page, int size) {
+    EndpointProtector.checkAuth();
+    Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "name"));
+    Page<Server> serverPage = serverRepository.findAll(pageable);
+    return new ServerPageDTO(serverPage);
+  }
+
+  public Server getServerById(Long id) {
     EndpointProtector.checkAuth();
     User user = currentAuthenticatedUser.getUser();
 
@@ -48,7 +60,7 @@ public class ServerService {
       throw new ModifiedException("Access denied: user has not joined this server");
     }
 
-    return server.getJoinedUsers();
+    return server;
   }
 
 }
