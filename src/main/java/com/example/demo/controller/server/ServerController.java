@@ -6,6 +6,7 @@ import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.stereotype.Controller;
 
 import com.example.demo.controller.inputs.server.CreateServerInput;
+import com.example.demo.controller.inputs.server.JoinServerInput;
 import com.example.demo.dto.server.ServerPageDTO;
 import com.example.demo.model.User;
 import com.example.demo.model.server.Server;
@@ -40,13 +41,12 @@ public class ServerController {
 
   @QueryMapping
   public Server getServerById(@Argument Long id) {
-    return serverService.getServerById(id); // Fetch user by ID from the service
+    return serverService.getServerById(id);
   }
-  //
-  //
-  // @MutationMapping
-  // public User deactivateUser(@Argument Long id) {
-  // return userService.deactivateUser(id); // Create a user via the service
-  // }
+
+  @MutationMapping
+  public Server joinServer(@Argument JoinServerInput input) {
+    return serverService.joinServer(input);
+  }
 
 }

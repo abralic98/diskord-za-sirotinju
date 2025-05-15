@@ -21,6 +21,7 @@ type Mutation {
   createServer(server: CreateServerInput): Server
   createRoom(room: CreateRoomInput): Room
   createMessage(message: CreateMessageInput): Message
+  joinServer(input: JoinServerInput): Server
 }
 
 # USERS ##############################
@@ -31,11 +32,19 @@ type User {
   email: String
   phoneNumber: Long
   avatar: String
+  userPresence: UserPresenceType
 }
 
 type UserWithToken {
   token: String
   user: User
+}
+
+enum UserPresenceType {
+  ONLINE
+  OFFLINE
+  AWAY
+  BUSY
 }
 
 input CreateUserInput {
@@ -81,6 +90,11 @@ type ServerPage {
   totalElements: Int!
   number: Int!
   size: Int!
+}
+
+input JoinServerInput {
+  id: ID!
+  invitationLink: String
 }
 
 type Room {

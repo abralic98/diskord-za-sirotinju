@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.example.demo.model.enums.UserPresenceType;
 import com.example.demo.model.server.Server;
 
 @Entity
@@ -35,6 +36,9 @@ public class User {
   @Column(nullable = true)
   private String avatar;
 
+  @Column(nullable = true)
+  private UserPresenceType userPresence;
+
   @ManyToMany(mappedBy = "joinedUsers")
   private List<Server> joinedServers = new ArrayList<>();
 
@@ -56,6 +60,7 @@ public class User {
     this.password = password;
     this.email = email;
     this.active = false;
+    this.userPresence = UserPresenceType.OFFLINE;
   }
 
   // Getters and setters
@@ -129,6 +134,14 @@ public class User {
 
   public void setDateUpdated(Date dateUpdated) {
     this.dateUpdated = dateUpdated;
+  }
+
+  public UserPresenceType getUserPresence() {
+    return userPresence;
+  }
+
+  public void setUserPresence(UserPresenceType userPresenceType) {
+    this.userPresence = userPresence;
   }
 
   @PrePersist // This method is called before the entity is persisted (inserted) into the
