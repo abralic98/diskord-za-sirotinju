@@ -21,12 +21,22 @@ public class Server {
   @Column(nullable = false)
   private String name;
 
+  @Column(nullable = true)
+  private String description;
+
+  @Column(nullable = true)
+  private String banner;
+
+  @Column(nullable = true)
+  private String serverImg;
+
   // One server has many rooms
   @OneToMany(mappedBy = "server")
   private List<Room> rooms;
 
   @Column(nullable = false)
   private Boolean publicServer;
+
 
   // Many servers can be created by one user
   @ManyToOne
@@ -50,8 +60,9 @@ public class Server {
 
   }
 
-  public Server(String name, User createdBy, Boolean publicServer) {
+  public Server(String name, User createdBy, Boolean publicServer, String description) {
     this.name = name;
+    this.description = description;
     this.createdBy = createdBy;
     this.publicServer = publicServer;
     this.joinedUsers = new ArrayList<>();
@@ -70,6 +81,30 @@ public class Server {
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  public String getBanner() {
+    return banner;
+  }
+
+  public void setBanner(String banner) {
+    this.banner = banner;
+  }
+
+  public String getServerImg() {
+    return serverImg;
+  }
+
+  public void setServerImg(String serverImg) {
+    this.serverImg = serverImg;
   }
 
   public Date getDateCreated() {

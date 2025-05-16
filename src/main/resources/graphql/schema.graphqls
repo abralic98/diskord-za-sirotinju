@@ -19,6 +19,7 @@ type Mutation {
   deactivateUser(id: ID): User
   createSession(credentials: CreateSessionInput): UserWithToken
   createServer(server: CreateServerInput): Server
+  updateServer(server: UpdateServerInput): Server
   createRoom(room: CreateRoomInput): Room
   createMessage(message: CreateMessageInput): Message
   joinServer(input: JoinServerInput): Server
@@ -78,10 +79,13 @@ input UpdateUserPasswordInput {
 type Server {
   id: ID
   name: String
+  description: String
   rooms: [Room]
   joinedUsers: [User]
   createdBy: User
   publicServer: Boolean
+  banner: String
+  serverImg: String
 }
 
 type ServerPage {
@@ -143,6 +147,15 @@ enum MessageType {
 input CreateServerInput {
   name: String!
   publicServer: Boolean!
+}
+
+input UpdateServerInput {
+  id: String!
+  name: String
+  description: String
+  banner: String
+  serverImg: String
+  publicServer: Boolean
 }
 
 input CreateRoomInput {

@@ -7,11 +7,10 @@ import org.springframework.stereotype.Controller;
 
 import com.example.demo.controller.inputs.server.CreateServerInput;
 import com.example.demo.controller.inputs.server.JoinServerInput;
+import com.example.demo.controller.inputs.server.UpdateServerInput;
 import com.example.demo.dto.server.ServerPageDTO;
-import com.example.demo.model.User;
 import com.example.demo.model.server.Server;
 import com.example.demo.service.server.ServerService;
-import com.example.demo.service.user.UserService;
 
 import java.util.List;
 
@@ -27,6 +26,11 @@ public class ServerController {
   @MutationMapping
   public Server createServer(@Argument CreateServerInput server) {
     return serverService.createServer(server);
+  }
+
+  @MutationMapping
+  public Server updateServer(@Argument UpdateServerInput server) {
+    return serverService.updateServer(server);
   }
 
   @QueryMapping

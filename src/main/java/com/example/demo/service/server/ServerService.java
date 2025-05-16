@@ -4,6 +4,7 @@ package com.example.demo.service.server;
 import com.example.demo.config.EndpointProtector;
 import com.example.demo.controller.inputs.server.CreateServerInput;
 import com.example.demo.controller.inputs.server.JoinServerInput;
+import com.example.demo.controller.inputs.server.UpdateServerInput;
 import com.example.demo.dto.server.ServerPageDTO;
 import com.example.demo.helpers.CurrentAuthenticatedUser;
 import com.example.demo.model.User;
@@ -33,8 +34,37 @@ public class ServerService {
   public Server createServer(CreateServerInput serverInput) {
     EndpointProtector.checkAuth();
     User user = currentAuthenticatedUser.getUser();
-    Server newServer = new Server(serverInput.getName(), user, serverInput.getPublicServer());
+    Server newServer = new Server(serverInput.getName(), user, serverInput.getPublicServer(),
+        serverInput.getDescription());
     return serverRepository.save(newServer);
+  }
+
+  public Server updateServer(UpdateServerInput serverInput) {
+    EndpointProtector.checkAuth();
+    User user = currentAuthenticatedUser.getUser();
+    Server server = serverRepository.findById(serverInput.getId()).orElseThrow(()-> new ModifiedException("Server not found"));
+
+    if (serverInput.getName() != null) {
+      server.setName(serverInput.getName());
+    }
+
+    if (serverInput.getDescription() != null) {
+      server.setDescription(serverInput.getDescription());
+    }
+
+    if (serverInput.getPublicServer() != null) {
+      server.setIsPublicServer(serverInput.getPublicServer());
+    }
+
+    if (serverInput.getBanner() != null) {
+      server.setBanner(serverInput.getBanner());
+    }
+
+    if (serverInput.getServerImg() != null) {
+      server.setServerImg(serverInput.getServerImg());
+    }
+
+    return serverRepository.save(server);
   }
 
   public List<Server> getAllUserServers() {
