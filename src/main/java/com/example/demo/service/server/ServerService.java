@@ -41,8 +41,11 @@ public class ServerService {
 
   public Server updateServer(UpdateServerInput serverInput) {
     EndpointProtector.checkAuth();
-    User user = currentAuthenticatedUser.getUser();
     Server server = serverRepository.findById(serverInput.getId()).orElseThrow(()-> new ModifiedException("Server not found"));
+    User user = currentAuthenticatedUser.getUser();
+    if(server.getCreatedBy() != user){
+      throw new ModifiedException("Only server creator can edit server");
+    }
 
     if (serverInput.getName() != null) {
       server.setName(serverInput.getName());
@@ -70,7 +73,7 @@ public class ServerService {
   public List<Server> getAllUserServers() {
     EndpointProtector.checkAuth();
     User user = currentAuthenticatedUser.getUser();
-    return serverRepository.findByJoinedUsersContaining(user);
+    return serverRepository.findServersByUserOrderedByName(user);
   }
 
   public ServerPageDTO getAllServers(int page, int size) {
