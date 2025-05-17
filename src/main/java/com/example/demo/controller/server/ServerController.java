@@ -5,11 +5,15 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.stereotype.Controller;
 
+import com.example.demo.controller.inputs.server.BanUserInput;
 import com.example.demo.controller.inputs.server.CreateServerInput;
 import com.example.demo.controller.inputs.server.JoinServerInput;
+import com.example.demo.controller.inputs.server.KickUserInput;
 import com.example.demo.controller.inputs.server.UpdateServerInput;
 import com.example.demo.dto.server.ServerPageDTO;
+import com.example.demo.model.User;
 import com.example.demo.model.server.Server;
+import com.example.demo.model.user.BannedUser;
 import com.example.demo.service.server.ServerService;
 
 import java.util.List;
@@ -51,6 +55,21 @@ public class ServerController {
   @MutationMapping
   public Server joinServer(@Argument JoinServerInput input) {
     return serverService.joinServer(input);
+  }
+
+  @MutationMapping
+  public Boolean kickUserFromServer(@Argument KickUserInput input ) {
+    return serverService.kickUserFromServer(input);
+  }
+
+  @MutationMapping
+  public Boolean banUserFromServer(@Argument BanUserInput input ) {
+    return serverService.banUserFromServer(input);
+  }
+
+  @QueryMapping
+  public List<BannedUser> getBannedUsersByServerId(@Argument Long id) {
+    return serverService.getBannedUsersByServerId(id);
   }
 
 }

@@ -2,14 +2,18 @@
 package com.example.demo.service.server;
 
 import com.example.demo.config.EndpointProtector;
+import com.example.demo.controller.inputs.server.BanUserInput;
 import com.example.demo.controller.inputs.server.CreateServerInput;
 import com.example.demo.controller.inputs.server.JoinServerInput;
+import com.example.demo.controller.inputs.server.KickUserInput;
 import com.example.demo.controller.inputs.server.UpdateServerInput;
 import com.example.demo.dto.server.ServerPageDTO;
 import com.example.demo.helpers.CurrentAuthenticatedUser;
 import com.example.demo.model.User;
 import com.example.demo.model.server.Server;
+import com.example.demo.model.user.BannedUser;
 import com.example.demo.repository.ServerRepository;
+import com.example.demo.repository.UserRepository;
 import com.example.demo.controller.global.ModifiedException;
 
 import org.springframework.data.domain.Page;
@@ -19,16 +23,20 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ServerService {
 
   private final ServerRepository serverRepository;
   private final CurrentAuthenticatedUser currentAuthenticatedUser;
+  private final UserRepository userRepository;
 
-  public ServerService(ServerRepository serverRepository, CurrentAuthenticatedUser currentAuthenticatedUser) {
+  public ServerService(ServerRepository serverRepository, CurrentAuthenticatedUser currentAuthenticatedUser,
+      UserRepository userRepository) {
     this.serverRepository = serverRepository;
     this.currentAuthenticatedUser = currentAuthenticatedUser;
+    this.userRepository = userRepository;
   }
 
   public Server createServer(CreateServerInput serverInput) {
@@ -41,9 +49,10 @@ public class ServerService {
 
   public Server updateServer(UpdateServerInput serverInput) {
     EndpointProtector.checkAuth();
-    Server server = serverRepository.findById(serverInput.getId()).orElseThrow(()-> new ModifiedException("Server not found"));
+    Server server = serverRepository.findById(serverInput.getId())
+        .orElseThrow(() -> new ModifiedException("Server not found"));
     User user = currentAuthenticatedUser.getUser();
-    if(server.getCreatedBy() != user){
+    if (server.getCreatedBy() != user) {
       throw new ModifiedException("Only server creator can edit server");
     }
 
@@ -114,4 +123,65 @@ public class ServerService {
     return server;
   }
 
+  public Boolean kickUserFromServer(KickUserInput input) {
+    EndpointProtector.checkAuth();
+
+    User user = currentAuthenticatedUser.getUser();
+    // ako posaljes random string kao id npr lalalala on pukne ne znam to resolvat
+    Server server = serverRepository.findById(input.getServerId())
+        .orElseThrow(() -> new ModifiedException("Server not found"));
+
+    Boolean permissionCheck = server.getCreatedBy().equals(user);
+
+    if (!permissionCheck) {
+      throw new ModifiedException("You dont have permission to ban");
+    }
+
+    User userToBeKicked = userRepository.findById(input.getUserId())
+        .orElseThrow(() -> new ModifiedException("User not found"));
+
+    if (!server.getJoinedUsers().contains(userToBeKicked)) {
+      throw new ModifiedException("User cannot be kicked since its not on the server");
+    }
+
+    server.getJoinedUsers().remove(userToBeKicked);
+    serverRepository.save(server);
+    return true;
+  }
+
+  public Boolean banUserFromServer(BanUserInput input) {
+    EndpointProtector.checkAuth();
+
+    User user = currentAuthenticatedUser.getUser();
+    Server server = serverRepository.findById(input.getServerId())
+        .orElseThrow(() -> new ModifiedException("Server not found"));
+
+    Boolean permissionCheck = server.getCreatedBy().equals(user);
+
+    if (!permissionCheck) {
+      throw new ModifiedException("You dont have permission to ban");
+    }
+
+    User userToBeBanned = userRepository.findById(input.getUserId())
+        .orElseThrow(() -> new ModifiedException("User not found"));
+
+    if (!server.getJoinedUsers().contains(userToBeBanned)) {
+      throw new ModifiedException("User cannot be banned since its not on the server");
+    }
+
+    server.getJoinedUsers().remove(userToBeBanned);
+    BannedUser banned = new BannedUser(userToBeBanned, server, input.getReason(), user);
+    server.getBannedUsers().add(banned);
+    serverRepository.save(server);
+    return true;
+  }
+
+  public List<BannedUser> getBannedUsersByServerId(Long id) {
+    EndpointProtector.checkAuth();
+
+    Server server = serverRepository.findById(id)
+        .orElseThrow(() -> new ModifiedException("Server not found"));
+
+    return server.getBannedUsers();
+  }
 }

@@ -9,6 +9,7 @@ import java.util.List;
 
 import com.example.demo.model.User;
 import com.example.demo.model.room.Room;
+import com.example.demo.model.user.BannedUser;
 
 @Entity
 @Table(name = "servers")
@@ -37,8 +38,6 @@ public class Server {
   @Column(nullable = false)
   private Boolean publicServer;
 
-
-  // Many servers can be created by one user
   @ManyToOne
   @JoinColumn(name = "created_by", nullable = false)
   private User createdBy;
@@ -46,6 +45,9 @@ public class Server {
   @ManyToMany
   @JoinTable(name = "server_users", joinColumns = @JoinColumn(name = "server_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
   private List<User> joinedUsers = new ArrayList<>();
+
+  @OneToMany(mappedBy = "server", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<BannedUser> bannedUsers = new ArrayList<>();
 
   @Temporal(TemporalType.TIMESTAMP)
   @Column(nullable = false, updatable = false)
@@ -145,6 +147,14 @@ public class Server {
 
   public void setJoinedUsers(List<User> joinedUsers) {
     this.joinedUsers = joinedUsers;
+  }
+
+  public List<BannedUser> getBannedUsers() {
+    return bannedUsers;
+  }
+
+  public void setBannedUsers(List<BannedUser> bannedUsers) {
+    this.bannedUsers = bannedUsers;
   }
 
   public boolean getIsPublicServer() {

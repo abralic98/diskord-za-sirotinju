@@ -10,6 +10,7 @@ type Query {
   getMessagesByRoomId(id: ID!, page: Int!, size: Int!): MessagePage!
   getRoomById(id: ID!): Room
   getServerById(id: ID!): Server
+  getBannedUsersByServerId(id: ID!): [BannedUser]
 }
 
 type Mutation {
@@ -23,6 +24,8 @@ type Mutation {
   createRoom(room: CreateRoomInput): Room
   createMessage(message: CreateMessageInput): Message
   joinServer(input: JoinServerInput): Server
+  kickUserFromServer(input: KickUserInput): Boolean
+  banUserFromServer(input: BanUserInput): Boolean
 }
 
 # USERS ##############################
@@ -34,6 +37,13 @@ type User {
   phoneNumber: Long
   avatar: String
   userPresence: UserPresenceType
+}
+type BannedUser {
+  user: User!
+  reason: String!
+  dateCreated: String
+  dateUpdated: String 
+  banAuthor: User!
 }
 
 type UserWithToken {
@@ -99,6 +109,17 @@ type ServerPage {
 input JoinServerInput {
   id: ID!
   invitationLink: String
+}
+
+input KickUserInput {
+  serverId: ID!
+  userId: ID!
+}
+
+input BanUserInput {
+  serverId: ID!
+  userId: ID!
+  reason: String!
 }
 
 type Room {

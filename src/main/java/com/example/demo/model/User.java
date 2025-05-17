@@ -9,6 +9,7 @@ import java.util.List;
 
 import com.example.demo.model.enums.UserPresenceType;
 import com.example.demo.model.server.Server;
+import com.example.demo.model.user.BannedUser;
 
 @Entity
 @Table(name = "users")
@@ -41,6 +42,9 @@ public class User {
 
   @ManyToMany(mappedBy = "joinedUsers")
   private List<Server> joinedServers = new ArrayList<>();
+
+  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<BannedUser> bannedInServers = new ArrayList<>();
 
   @Temporal(TemporalType.TIMESTAMP)
   @Column(nullable = false, updatable = false)
@@ -141,7 +145,7 @@ public class User {
   }
 
   public void setUserPresence(UserPresenceType userPresenceType) {
-    this.userPresence = userPresence;
+    this.userPresence = userPresenceType;
   }
 
   @PrePersist // This method is called before the entity is persisted (inserted) into the
