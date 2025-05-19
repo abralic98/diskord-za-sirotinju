@@ -9,6 +9,7 @@ import com.example.demo.controller.inputs.server.BanUserInput;
 import com.example.demo.controller.inputs.server.CreateServerInput;
 import com.example.demo.controller.inputs.server.JoinServerInput;
 import com.example.demo.controller.inputs.server.KickUserInput;
+import com.example.demo.controller.inputs.server.UnbanUserInput;
 import com.example.demo.controller.inputs.server.UpdateServerInput;
 import com.example.demo.dto.server.ServerPageDTO;
 import com.example.demo.model.User;
@@ -65,6 +66,11 @@ public class ServerController {
   @MutationMapping
   public Boolean banUserFromServer(@Argument BanUserInput input ) {
     return serverService.banUserFromServer(input);
+  }
+
+  @MutationMapping
+  public Boolean unbanUserFromServer(@Argument UnbanUserInput input ) {
+    return serverService.unbanUserFromServer(input);
   }
 
   @QueryMapping

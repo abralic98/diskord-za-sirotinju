@@ -26,6 +26,7 @@ type Mutation {
   joinServer(input: JoinServerInput): Server
   kickUserFromServer(input: KickUserInput): Boolean
   banUserFromServer(input: BanUserInput): Boolean
+  unbanUserFromServer(input: UnbanUserInput): Boolean
 }
 
 # USERS ##############################
@@ -120,6 +121,11 @@ input BanUserInput {
   serverId: ID!
   userId: ID!
   reason: String!
+}
+
+input UnbanUserInput {
+  serverId: ID!
+  userId: ID!
 }
 
 type Room {

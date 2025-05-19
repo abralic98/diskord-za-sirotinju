@@ -6,6 +6,7 @@ import com.example.demo.controller.inputs.server.BanUserInput;
 import com.example.demo.controller.inputs.server.CreateServerInput;
 import com.example.demo.controller.inputs.server.JoinServerInput;
 import com.example.demo.controller.inputs.server.KickUserInput;
+import com.example.demo.controller.inputs.server.UnbanUserInput;
 import com.example.demo.controller.inputs.server.UpdateServerInput;
 import com.example.demo.dto.server.ServerPageDTO;
 import com.example.demo.helpers.CurrentAuthenticatedUser;
@@ -172,6 +173,47 @@ public class ServerService {
     server.getJoinedUsers().remove(userToBeBanned);
     BannedUser banned = new BannedUser(userToBeBanned, server, input.getReason(), user);
     server.getBannedUsers().add(banned);
+    serverRepository.save(server);
+    return true;
+  }
+
+  public BannedUser getBannedUserByUserId(Server server, Long userId) {
+    for (BannedUser bannedUser : server.getBannedUsers()) {
+      if (bannedUser.getUser().getId().equals(userId)) {
+        return bannedUser;
+      }
+    }
+    throw new ModifiedException("User not found");
+  }
+
+  public Boolean unbanUserFromServer(UnbanUserInput input) {
+    EndpointProtector.checkAuth();
+
+    User user = currentAuthenticatedUser.getUser();
+    Server server = serverRepository.findById(input.getServerId())
+        .orElseThrow(() -> new ModifiedException("Server not found"));
+
+    Boolean permissionCheck = server.getCreatedBy().equals(user);
+
+    if (!permissionCheck) {
+      throw new ModifiedException("You dont have permission to ban");
+    }
+
+    BannedUser bannedUser = getBannedUserByUserId(server, input.getUserId());
+
+    System.out.println("loleoeawodewa");
+    System.out.println(bannedUser);
+
+    if (!server.getBannedUsers().contains(bannedUser)) {
+      throw new ModifiedException("User is already unbanned");
+    }
+
+    server.getBannedUsers().remove(bannedUser);
+
+    User addUserToServer = userRepository.findById(input.getUserId())
+        .orElseThrow(() -> new ModifiedException("User not found"));
+
+    server.getJoinedUsers().add(addUserToServer);
     serverRepository.save(server);
     return true;
   }
