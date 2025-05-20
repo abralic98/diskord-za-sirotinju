@@ -24,7 +24,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class ServerService {
@@ -86,10 +85,18 @@ public class ServerService {
     return serverRepository.findServersByUserOrderedByName(user);
   }
 
-  public ServerPageDTO getAllServers(int page, int size) {
+  public ServerPageDTO getAllServers(int page, int size, String search) {
     EndpointProtector.checkAuth();
     Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "name"));
-    Page<Server> serverPage = serverRepository.findAll(pageable);
+
+    Page<Server> serverPage;
+
+    if (search != null && !search.trim().isEmpty()) {
+      serverPage = serverRepository.findByNameContainingIgnoreCase(search.trim(), pageable);
+    } else {
+      serverPage = serverRepository.findAll(pageable);
+    }
+
     return new ServerPageDTO(serverPage);
   }
 

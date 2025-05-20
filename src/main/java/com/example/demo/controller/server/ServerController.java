@@ -44,8 +44,8 @@ public class ServerController {
   }
 
   @QueryMapping
-  public ServerPageDTO getAllServers(@Argument int page, @Argument int size) {
-    return serverService.getAllServers(page, size);
+  public ServerPageDTO getAllServers(@Argument int page, @Argument int size, @Argument String search) {
+    return serverService.getAllServers(page, size, search);
   }
 
   @QueryMapping

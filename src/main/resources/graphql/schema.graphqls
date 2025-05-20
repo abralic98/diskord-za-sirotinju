@@ -4,7 +4,7 @@ type Query {
   meQuery: User
   getAllUsers: [User]
   getUserById(id: ID!): User
-  getAllServers(page: Int!, size: Int!): ServerPage!
+  getAllServers(page: Int!, size: Int!, search: String): ServerPage!
   getAllUserServers: [Server]
   getRoomsByServerId(id: ID!): Rooms
   getMessagesByRoomId(id: ID!, page: Int!, size: Int!): MessagePage!
