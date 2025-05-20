@@ -8,4 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MessageRepository extends JpaRepository<Message, Long> {
   Page<Message> findByRoomId(Long roomId, Pageable pageable);
+
+  Page<Message> findByTextContainingIgnoreCase(String text, Pageable pageable);
 }

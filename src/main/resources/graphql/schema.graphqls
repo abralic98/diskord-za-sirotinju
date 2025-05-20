@@ -7,7 +7,7 @@ type Query {
   getAllServers(page: Int!, size: Int!, search: String): ServerPage!
   getAllUserServers: [Server]
   getRoomsByServerId(id: ID!): Rooms
-  getMessagesByRoomId(id: ID!, page: Int!, size: Int!): MessagePage!
+  getMessagesByRoomId(id: ID!, page: Int!, size: Int!, search: String): MessagePage!
   getRoomById(id: ID!): Room
   getServerById(id: ID!): Server
   getBannedUsersByServerId(id: ID!): [BannedUser]

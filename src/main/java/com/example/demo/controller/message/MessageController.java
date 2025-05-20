@@ -34,8 +34,9 @@ public class MessageController {
   // @Argument da uspijem pokrenit projekt
   // ali bitno da se ne crveni nista ako zaboravim stavit unlucky
   @QueryMapping
-  public MessagePageDTO getMessagesByRoomId(@Argument Long id, @Argument int page, @Argument int size) {
-    return messageService.getMessagesByRoomId(id, page, size);
+  public MessagePageDTO getMessagesByRoomId(@Argument Long id, @Argument int page, @Argument int size,
+      @Argument String search) {
+    return messageService.getMessagesByRoomId(id, page, size, search);
   }
 
 }

@@ -42,7 +42,7 @@ public class MessageService {
     return messageRepository.save(message);
   }
 
-  public MessagePageDTO getMessagesByRoomId(Long roomId, int page, int size) {
+  public MessagePageDTO getMessagesByRoomId(Long roomId, int page, int size, String search) {
     EndpointProtector.checkAuth();
     User user = currentAuthenticatedUser.getUser();
 
@@ -53,8 +53,15 @@ public class MessageService {
         throw new ModifiedException("Access denied: user has not joined the server");
     }
 
+    Page<Message> messagePage;
     Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "dateCreated"));
-    Page<Message> messagePage = messageRepository.findByRoomId(roomId, pageable);
+
+    if (search != null && !search.trim().isEmpty()) {
+      messagePage = messageRepository.findByTextContainingIgnoreCase(search.trim(), pageable);
+    } else {
+      messagePage = messageRepository.findByRoomId(roomId, pageable);
+    }
+    messageRepository.findByRoomId(roomId, pageable);
     return new MessagePageDTO(messagePage);
   }
 
