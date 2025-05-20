@@ -25,13 +25,15 @@ public class Room {
   @Column(nullable = false)
   private RoomType type;
 
-  @OneToMany(mappedBy = "room")
+  @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Message> messages;
+
 
   // Many rooms belong to one server
   @ManyToOne
   @JoinColumn(name = "server_id", nullable = false)
   private Server server;
+
 
   @ManyToOne
   @JoinColumn(name = "created_by", nullable = false)

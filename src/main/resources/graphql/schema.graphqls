@@ -27,6 +27,7 @@ type Mutation {
   kickUserFromServer(input: KickUserInput): Boolean
   banUserFromServer(input: BanUserInput): Boolean
   unbanUserFromServer(input: UnbanUserInput): Boolean
+  deleteServer(serverId: ID!): Boolean
 }
 
 # USERS ##############################

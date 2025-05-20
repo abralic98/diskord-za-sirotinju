@@ -205,7 +205,7 @@ public class ServerService {
     System.out.println(bannedUser);
 
     if (!server.getBannedUsers().contains(bannedUser)) {
-      throw new ModifiedException("User is already unbanned");
+      throw new ModifiedException("User is allready unbanned");
     }
 
     server.getBannedUsers().remove(bannedUser);
@@ -225,5 +225,11 @@ public class ServerService {
         .orElseThrow(() -> new ModifiedException("Server not found"));
 
     return server.getBannedUsers();
+  }
+
+  public Boolean deleteServer(Long id) {
+    Server server = serverRepository.findById(id).orElseThrow(() -> new ModifiedException("Server not found"));
+    serverRepository.delete(server);
+    return true;
   }
 }

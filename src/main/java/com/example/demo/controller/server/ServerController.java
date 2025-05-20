@@ -78,4 +78,9 @@ public class ServerController {
     return serverService.getBannedUsersByServerId(id);
   }
 
+  @MutationMapping
+  public Boolean deleteServer(@Argument Long serverId ) {
+    return serverService.deleteServer(serverId);
+  }
+
 }

@@ -31,8 +31,7 @@ public class Server {
   @Column(nullable = true)
   private String serverImg;
 
-  // One server has many rooms
-  @OneToMany(mappedBy = "server")
+  @OneToMany(mappedBy = "server", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Room> rooms;
 
   @Column(nullable = false)
@@ -163,6 +162,10 @@ public class Server {
 
   public void setIsPublicServer(Boolean isPublic) {
     this.publicServer = isPublic;
+  }
+  @PreRemove
+  private void removeUsersFromServer() {
+      joinedUsers.clear();
   }
 
   @PrePersist // This method is called before the entity is persisted (inserted) into the
