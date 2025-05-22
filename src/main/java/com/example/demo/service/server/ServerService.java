@@ -11,8 +11,10 @@ import com.example.demo.controller.inputs.server.UpdateServerInput;
 import com.example.demo.dto.server.ServerPageDTO;
 import com.example.demo.helpers.CurrentAuthenticatedUser;
 import com.example.demo.model.User;
+import com.example.demo.model.invite.ServerInvite;
 import com.example.demo.model.server.Server;
 import com.example.demo.model.user.BannedUser;
+import com.example.demo.repository.ServerInviteRepository;
 import com.example.demo.repository.ServerRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.controller.global.ModifiedException;
@@ -23,6 +25,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -31,12 +34,14 @@ public class ServerService {
   private final ServerRepository serverRepository;
   private final CurrentAuthenticatedUser currentAuthenticatedUser;
   private final UserRepository userRepository;
+  private final ServerInviteRepository serverInviteRepository;
 
   public ServerService(ServerRepository serverRepository, CurrentAuthenticatedUser currentAuthenticatedUser,
-      UserRepository userRepository) {
+      UserRepository userRepository, ServerInviteRepository serverInviteRepository) {
     this.serverRepository = serverRepository;
     this.currentAuthenticatedUser = currentAuthenticatedUser;
     this.userRepository = userRepository;
+    this.serverInviteRepository = serverInviteRepository;
   }
 
   public Server createServer(CreateServerInput serverInput) {
@@ -92,9 +97,9 @@ public class ServerService {
     Page<Server> serverPage;
 
     if (search != null && !search.trim().isEmpty()) {
-      serverPage = serverRepository.findByNameContainingIgnoreCase(search.trim(), pageable);
+      serverPage = serverRepository.findByPublicServerTrueAndNameContainingIgnoreCase(search.trim(), pageable);
     } else {
-      serverPage = serverRepository.findAll(pageable);
+      serverPage = serverRepository.findByPublicServerTrue(pageable);
     }
 
     return new ServerPageDTO(serverPage);
@@ -235,8 +240,55 @@ public class ServerService {
   }
 
   public Boolean deleteServer(Long id) {
+    EndpointProtector.checkAuth();
+    User user = currentAuthenticatedUser.getUser();
     Server server = serverRepository.findById(id).orElseThrow(() -> new ModifiedException("Server not found"));
+
+    Boolean permissionCheck = server.getCreatedBy().equals(user);
+
+    if (!permissionCheck) {
+      throw new ModifiedException("You dont have permission to delete server");
+    }
     serverRepository.delete(server);
     return true;
+  }
+
+  public String generateInviteLink(Long serverId) {
+    EndpointProtector.checkAuth();
+    User user = currentAuthenticatedUser.getUser();
+    Server server = serverRepository.findById(serverId)
+        .orElseThrow(() -> new RuntimeException("Server not found"));
+
+    Boolean permissionCheck = server.getCreatedBy().equals(user);
+
+    if (!permissionCheck) {
+      throw new ModifiedException("You dont have permission to generate server link");
+    }
+
+    ServerInvite invite = new ServerInvite(server, 60);
+    serverInviteRepository.save(invite);
+
+    return "http://localhost:3000/invite/" + invite.getToken();
+  }
+
+  public Server joinServerWithInvite(String token) {
+    EndpointProtector.checkAuth();
+    User user = currentAuthenticatedUser.getUser();
+    ServerInvite invite = serverInviteRepository.findByToken(token)
+        .orElseThrow(() -> new RuntimeException("Invalid invite"));
+
+    if (invite.getExpiresAt().before(new Date())) {
+      throw new RuntimeException("Invite expired");
+    }
+
+    Server server = invite.getServer();
+    if (server.getJoinedUsers().contains(user)) {
+      throw new ModifiedException("User has already joined to this server");
+    }
+    if (!server.getJoinedUsers().contains(user)) {
+      server.getJoinedUsers().add(user);
+      serverRepository.save(server);
+    }
+    return server;
   }
 }

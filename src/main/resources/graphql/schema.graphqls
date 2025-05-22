@@ -7,7 +7,12 @@ type Query {
   getAllServers(page: Int!, size: Int!, search: String): ServerPage!
   getAllUserServers: [Server]
   getRoomsByServerId(id: ID!): Rooms
-  getMessagesByRoomId(id: ID!, page: Int!, size: Int!, search: String): MessagePage!
+  getMessagesByRoomId(
+    id: ID!
+    page: Int!
+    size: Int!
+    search: String
+  ): MessagePage!
   getRoomById(id: ID!): Room
   getServerById(id: ID!): Server
   getBannedUsersByServerId(id: ID!): [BannedUser]
@@ -28,6 +33,8 @@ type Mutation {
   banUserFromServer(input: BanUserInput): Boolean
   unbanUserFromServer(input: UnbanUserInput): Boolean
   deleteServer(serverId: ID!): Boolean
+  joinServerWithInvite(token: String): Server
+  generateInviteLink(serverId: ID!): String
 }
 
 # USERS ##############################
@@ -44,7 +51,7 @@ type BannedUser {
   user: User!
   reason: String!
   dateCreated: String
-  dateUpdated: String 
+  dateUpdated: String
   banAuthor: User!
 }
 

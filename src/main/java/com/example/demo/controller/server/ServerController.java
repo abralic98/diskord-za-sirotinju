@@ -59,17 +59,17 @@ public class ServerController {
   }
 
   @MutationMapping
-  public Boolean kickUserFromServer(@Argument KickUserInput input ) {
+  public Boolean kickUserFromServer(@Argument KickUserInput input) {
     return serverService.kickUserFromServer(input);
   }
 
   @MutationMapping
-  public Boolean banUserFromServer(@Argument BanUserInput input ) {
+  public Boolean banUserFromServer(@Argument BanUserInput input) {
     return serverService.banUserFromServer(input);
   }
 
   @MutationMapping
-  public Boolean unbanUserFromServer(@Argument UnbanUserInput input ) {
+  public Boolean unbanUserFromServer(@Argument UnbanUserInput input) {
     return serverService.unbanUserFromServer(input);
   }
 
@@ -79,8 +79,18 @@ public class ServerController {
   }
 
   @MutationMapping
-  public Boolean deleteServer(@Argument Long serverId ) {
+  public Boolean deleteServer(@Argument Long serverId) {
     return serverService.deleteServer(serverId);
+  }
+
+  @MutationMapping
+  public String generateInviteLink(@Argument Long serverId) {
+    return serverService.generateInviteLink(serverId);
+  }
+
+  @MutationMapping
+  public Server joinServerWithInvite(@Argument String token) {
+    return serverService.joinServerWithInvite(token);
   }
 
 }

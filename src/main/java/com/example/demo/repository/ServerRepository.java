@@ -15,5 +15,7 @@ public interface ServerRepository extends JpaRepository<Server, Long> {
   @Query("SELECT s FROM Server s JOIN s.joinedUsers u WHERE u = :user ORDER BY s.name ASC")
   List<Server> findServersByUserOrderedByName(@Param("user") User user);
 
-  Page<Server> findByNameContainingIgnoreCase(String name, Pageable pageable);
+  Page<Server> findByPublicServerTrueAndNameContainingIgnoreCase(String name, Pageable pageable);
+
+  Page<Server> findByPublicServerTrue(Pageable pageable);
 }
