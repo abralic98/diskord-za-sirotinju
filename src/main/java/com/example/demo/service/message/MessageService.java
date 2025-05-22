@@ -46,22 +46,22 @@ public class MessageService {
     EndpointProtector.checkAuth();
     User user = currentAuthenticatedUser.getUser();
 
-    Room room = roomRepository.findById(roomId).orElseThrow(() -> new ModifiedException(("Room not found")));
+    Room room = roomRepository.findById(roomId).orElseThrow(() -> new ModifiedException("Room not found"));
     Server server = room.getServer();
 
     if (!server.getJoinedUsers().contains(user)) {
-        throw new ModifiedException("Access denied: user has not joined the server");
+      throw new ModifiedException("Access denied: user has not joined the server");
     }
 
-    Page<Message> messagePage;
     Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "dateCreated"));
+    Page<Message> messagePage;
 
     if (search != null && !search.trim().isEmpty()) {
-      messagePage = messageRepository.findByTextContainingIgnoreCase(search.trim(), pageable);
+      messagePage = messageRepository.findByRoomIdAndTextContainingIgnoreCase(roomId, search.trim(), pageable);
     } else {
       messagePage = messageRepository.findByRoomId(roomId, pageable);
     }
-    messageRepository.findByRoomId(roomId, pageable);
+
     return new MessagePageDTO(messagePage);
   }
 
