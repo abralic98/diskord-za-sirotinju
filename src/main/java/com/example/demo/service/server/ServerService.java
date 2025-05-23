@@ -275,10 +275,10 @@ public class ServerService {
     EndpointProtector.checkAuth();
     User user = currentAuthenticatedUser.getUser();
     ServerInvite invite = serverInviteRepository.findByToken(token)
-        .orElseThrow(() -> new RuntimeException("Invalid invite"));
+        .orElseThrow(() -> new ModifiedException("Invalid invite"));
 
     if (invite.getExpiresAt().before(new Date())) {
-      throw new RuntimeException("Invite expired");
+      throw new ModifiedException("Invite expired");
     }
 
     Server server = invite.getServer();
@@ -290,5 +290,14 @@ public class ServerService {
       serverRepository.save(server);
     }
     return server;
+  }
+
+  public Server getServerByInviteToken(String token){
+    EndpointProtector.checkAuth();
+    ServerInvite invite = serverInviteRepository.findByToken(token)
+        .orElseThrow(() -> new RuntimeException("Invalid invite"));
+    Server server = invite.getServer();
+    return server;
+
   }
 }

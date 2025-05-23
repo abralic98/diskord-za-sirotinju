@@ -16,6 +16,7 @@ type Query {
   getRoomById(id: ID!): Room
   getServerById(id: ID!): Server
   getBannedUsersByServerId(id: ID!): [BannedUser]
+  getServerByInvite(token: String!): Server
 }
 
 type Mutation {

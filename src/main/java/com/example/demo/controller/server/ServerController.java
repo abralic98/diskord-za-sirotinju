@@ -93,4 +93,9 @@ public class ServerController {
     return serverService.joinServerWithInvite(token);
   }
 
+  @QueryMapping
+  public Server getServerByInvite(@Argument String token) {
+    return serverService.getServerByInviteToken(token);
+  }
+
 }
