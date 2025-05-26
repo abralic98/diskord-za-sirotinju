@@ -29,4 +29,6 @@ public class WebSocketConfig implements WebSocketConfigurer {
   public VoiceWebSocketHandler voiceWebSocketHandler() {
     return new VoiceWebSocketHandler(userRepository);
   }
+
 }
+

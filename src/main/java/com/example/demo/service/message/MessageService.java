@@ -16,9 +16,12 @@ import com.example.demo.model.User;
 import com.example.demo.model.message.Message;
 import com.example.demo.model.room.Room;
 import com.example.demo.model.server.Server;
+import com.example.demo.publishers.MessagePublisher;
 import com.example.demo.controller.global.ModifiedException;
 import com.example.demo.repository.MessageRepository;
 import com.example.demo.repository.RoomRepository;
+
+import reactor.core.publisher.Flux;
 
 @Service
 public class MessageService {
@@ -26,12 +29,14 @@ public class MessageService {
   private final RoomRepository roomRepository;
   private final MessageRepository messageRepository;
   private final CurrentAuthenticatedUser currentAuthenticatedUser;
+  private final MessagePublisher messagePublisher;
 
   public MessageService(MessageRepository messageRepository, RoomRepository roomRepository,
-      CurrentAuthenticatedUser currentAuthenticatedUser) {
+      CurrentAuthenticatedUser currentAuthenticatedUser, MessagePublisher messagePublisher) {
     this.messageRepository = messageRepository;
     this.roomRepository = roomRepository;
     this.currentAuthenticatedUser = currentAuthenticatedUser;
+    this.messagePublisher = messagePublisher;
   }
 
   public Message createMessage(CreateMessageInput input) {
@@ -39,6 +44,7 @@ public class MessageService {
     User user = currentAuthenticatedUser.getUser();
     Room room = roomRepository.getById(input.getRoomId());
     Message message = new Message(input.getText(), input.getType(), room, user);
+    messagePublisher.publish(input.getRoomId(), message);
     return messageRepository.save(message);
   }
 
@@ -65,4 +71,17 @@ public class MessageService {
     return new MessagePageDTO(messagePage);
   }
 
+  public Flux<Message> messageAdded(Long roomId) {
+
+    // auth problem kad stavim puca
+    // User user = currentAuthenticatedUser.getUser();
+    // Room room = roomRepository.findById(roomId)
+    //     .orElseThrow(() -> new ModifiedException("Room not found"));
+    //
+    // if (!room.getServer().getJoinedUsers().contains(user)) {
+    //   throw new ModifiedException("Access denied: user has not joined the server");
+    // }
+
+    return messagePublisher.subscribe(roomId);
+  }
 }

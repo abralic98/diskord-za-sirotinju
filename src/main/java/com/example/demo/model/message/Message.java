@@ -37,7 +37,6 @@ public class Message {
   @Column(nullable = false)
   private Date dateUpdated;
 
-
   public Message() {
 
   }
@@ -49,6 +48,10 @@ public class Message {
     this.author = author;
     this.dateCreated = new Date();
     this.dateUpdated = new Date();
+  }
+
+  public Room getRoom() {
+    return room;
   }
 
   @PrePersist // This method is called before the entity is persisted (inserted) into the
@@ -63,5 +66,5 @@ public class Message {
   protected void onUpdate() {
     dateUpdated = new Date(); // Update dateUpdated whenever the entity is updated
   }
-  
+
 }

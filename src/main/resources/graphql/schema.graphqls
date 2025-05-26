@@ -38,6 +38,10 @@ type Mutation {
   generateInviteLink(serverId: ID!): String
 }
 
+type Subscription {
+  messageAdded(roomId: ID!): Message
+}
+
 # USERS ##############################
 
 type User {
