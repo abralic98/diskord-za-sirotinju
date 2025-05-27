@@ -73,7 +73,7 @@ public class MessageService {
 
   public Flux<Message> messageAdded(Long roomId) {
 
-    // auth problem kad stavim puca
+    // auth problem kad stavim puca zato jer http radi ws ne radi nije isto
     // User user = currentAuthenticatedUser.getUser();
     // Room room = roomRepository.findById(roomId)
     //     .orElseThrow(() -> new ModifiedException("Room not found"));

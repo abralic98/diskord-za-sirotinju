@@ -1,3 +1,4 @@
+
 package com.example.demo.publishers;
 
 import java.util.Map;
@@ -23,7 +24,10 @@ public class MessagePublisher {
   }
 
   public Flux<Message> subscribe(Long roomId) {
-    Sinks.Many<Message> sink = sinks.computeIfAbsent(roomId, id -> Sinks.many().multicast().onBackpressureBuffer());
+    Sinks.Many<Message> sink = sinks.computeIfAbsent(
+        roomId,
+        id -> Sinks.many().replay().latest() // Keeps the stream alive and replays latest message
+    );
     return sink.asFlux();
   }
 }
