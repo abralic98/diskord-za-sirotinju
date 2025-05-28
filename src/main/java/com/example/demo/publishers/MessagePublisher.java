@@ -23,10 +23,14 @@ public class MessagePublisher {
     }
   }
 
+  // napravi novi sink ako zatrazi konekciju nakon refresha frontend bug
   public Flux<Message> subscribe(Long roomId) {
-    Sinks.Many<Message> sink = sinks.computeIfAbsent(
-        roomId,
-        id -> Sinks.many().multicast().onBackpressureBuffer());
-    return sink.asFlux();
+    return sinks.compute(roomId, (id, existingSink) -> {
+      if (existingSink == null || existingSink.currentSubscriberCount() == 0
+          || existingSink.tryEmitComplete().isFailure()) {
+        return Sinks.many().multicast().onBackpressureBuffer();
+      }
+      return existingSink;
+    }).asFlux();
   }
 }
