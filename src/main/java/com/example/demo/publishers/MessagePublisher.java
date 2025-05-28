@@ -26,8 +26,7 @@ public class MessagePublisher {
   public Flux<Message> subscribe(Long roomId) {
     Sinks.Many<Message> sink = sinks.computeIfAbsent(
         roomId,
-        id -> Sinks.many().replay().latest() // Keeps the stream alive and replays latest message
-    );
+        id -> Sinks.many().multicast().onBackpressureBuffer());
     return sink.asFlux();
   }
 }
