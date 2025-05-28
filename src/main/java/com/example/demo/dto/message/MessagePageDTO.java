@@ -21,5 +21,4 @@ public class MessagePageDTO {
     this.size = page.getSize();
   }
 
-  // Getters here...
 }

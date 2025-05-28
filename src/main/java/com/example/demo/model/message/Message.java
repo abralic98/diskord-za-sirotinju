@@ -33,6 +33,7 @@ public class Message {
   @Column(nullable = false, updatable = false)
   private Date dateCreated;
 
+
   @Temporal(TemporalType.TIMESTAMP)
   @Column(nullable = false)
   private Date dateUpdated;
