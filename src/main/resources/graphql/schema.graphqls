@@ -17,6 +17,8 @@ type Query {
   getServerById(id: ID!): Server
   getBannedUsersByServerId(id: ID!): [BannedUser]
   getServerByInvite(token: String!): Server
+  getMyInbox: [Inbox]
+  getInboxById(id: ID!): Inbox
 }
 
 type Mutation {
@@ -36,6 +38,7 @@ type Mutation {
   deleteServer(serverId: ID!): Boolean
   joinServerWithInvite(token: String): Server
   generateInviteLink(serverId: ID!): String
+  createInbox(withUserId: ID!): Inbox
 }
 
 type Subscription {
@@ -88,6 +91,7 @@ input UpdateUserInput {
   email: String
   phoneNumber: Long
   avatar: String
+  userPresence: UserPresenceType
 }
 
 input UpdateUserPasswordInput {
@@ -208,6 +212,34 @@ input CreateMessageInput {
   text: String!
   type: MessageType!
   roomId: ID!
+}
+
+####################################
+
+### DIRECT MESSAGES
+
+type Inbox {
+  id: ID
+  messages: [DirectMessage]
+  users: [User]
+  dateCreated: String
+  dateUpdated: String
+}
+
+type DirectMessage {
+  id: ID
+  text: String
+  author: User
+  inbox: Inbox
+  type: MessageType
+  dateCreated: String
+  dateUpdated: String
+}
+
+input CreateDMInput {
+  text: String!
+  type: MessageType!
+  inboxId: ID!
 }
 
 ####################################

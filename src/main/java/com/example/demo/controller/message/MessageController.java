@@ -27,14 +27,6 @@ public class MessageController {
     return messageService.createMessage(message);
   }
 
-  // u raspaloj javi ne mozes stavit name argumenta drugaciji od onoga u schemi
-  // znaci controler i service funkcija mora primat isto ime argumenta kao u
-  // schemi 2h izgubljeno unlucky
-  // ALTERNATIVA public List<Message> getMessagesByRoomId(@Argument("roomId") Long
-  // id) boze sacuvaj
-  // kad pogledas donekle i ima smisla jer svaki put moram stavljat raspali
-  // @Argument da uspijem pokrenit projekt
-  // ali bitno da se ne crveni nista ako zaboravim stavit unlucky
   @QueryMapping
   public MessagePageDTO getMessagesByRoomId(@Argument Long id, @Argument int page, @Argument int size,
       @Argument String search) {

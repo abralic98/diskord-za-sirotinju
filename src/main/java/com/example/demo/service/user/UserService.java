@@ -69,6 +69,14 @@ public class UserService {
       currentUser.setAvatar(user.getAvatar());
     }
 
+    if (user.getAvatar() != null) {
+      currentUser.setAvatar(user.getAvatar());
+    }
+
+    if (user.getUserPresence() != null) {
+      currentUser.setUserPresence(user.getUserPresence());
+    }
+
     User updatedUser = userRepository.save(currentUser);
     currentAuthenticatedUser.refreshAuthentication(updatedUser);
     return updatedUser;
