@@ -40,7 +40,8 @@ public class MessageService {
   public Message createMessage(CreateMessageInput input) {
     EndpointProtector.checkAuth();
     User user = currentAuthenticatedUser.getUser();
-    Room room = roomRepository.getById(input.getRoomId());
+    Room room = roomRepository.findById(input.getRoomId())
+        .orElseThrow(() -> new ModifiedException("Room with this id does not exist"));
     Message message = new Message(input.getText(), input.getType(), room, user);
     messagePublisher.publish(input.getRoomId(), message);
     return messageRepository.save(message);
@@ -69,15 +70,15 @@ public class MessageService {
     return new MessagePageDTO(messagePage);
   }
 
-  public Flux<Message> messageAdded(Long roomId) {
+  public Flux<Message> subscribeToMessagesByRoomId(Long roomId) {
 
     // auth problem kad stavim puca zato jer http radi ws ne radi nije isto
     // User user = currentAuthenticatedUser.getUser();
     // Room room = roomRepository.findById(roomId)
-    //     .orElseThrow(() -> new ModifiedException("Room not found"));
+    // .orElseThrow(() -> new ModifiedException("Room not found"));
     //
     // if (!room.getServer().getJoinedUsers().contains(user)) {
-    //   throw new ModifiedException("Access denied: user has not joined the server");
+    // throw new ModifiedException("Access denied: user has not joined the server");
     // }
 
     return messagePublisher.subscribe(roomId);

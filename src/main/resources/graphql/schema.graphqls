@@ -19,6 +19,12 @@ type Query {
   getServerByInvite(token: String!): Server
   getMyInbox: [Inbox]
   getInboxById(id: ID!): Inbox
+  getDirectMessagesByInboxId(
+    id: ID!
+    page: Int!
+    size: Int!
+    search: String
+  ): DirectMessagePage!
 }
 
 type Mutation {
@@ -39,10 +45,12 @@ type Mutation {
   joinServerWithInvite(token: String): Server
   generateInviteLink(serverId: ID!): String
   createInbox(withUserId: ID!): Inbox
+  createDirectMessage(message: CreateDMInput): DirectMessage
 }
 
 type Subscription {
-  messageAdded(roomId: ID!): Message
+  subscribeToMessagesByRoomId(roomId: ID!): Message
+  subscribeToMessagesByInboxId(inboxId: ID!): DirectMessage
 }
 
 # USERS ##############################
@@ -240,6 +248,14 @@ input CreateDMInput {
   text: String!
   type: MessageType!
   inboxId: ID!
+}
+
+type DirectMessagePage {
+  content: [DirectMessage!]!
+  totalPages: Int!
+  totalElements: Int!
+  number: Int!
+  size: Int!
 }
 
 ####################################

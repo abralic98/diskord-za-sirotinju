@@ -34,9 +34,9 @@ public class MessageController {
   }
 
   @SubscriptionMapping
-  public Flux<Message> messageAdded(@Argument Long roomId) {
+  public Flux<Message> subscribeToMessagesByRoomId(@Argument Long roomId) {
     try {
-      return messageService.messageAdded(roomId);
+      return messageService.subscribeToMessagesByRoomId(roomId);
     } catch (Exception e) {
       e.printStackTrace(); 
       throw e;

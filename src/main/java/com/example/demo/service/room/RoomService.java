@@ -49,7 +49,8 @@ public class RoomService {
   public Room createRoom(CreateRoomInput input) {
     EndpointProtector.checkAuth();
     User user = currentAuthenticatedUser.getUser();
-    Server server = serverRepository.getById(input.getServerId());
+    Server server = serverRepository.findById(input.getServerId())
+        .orElseThrow(() -> new ModifiedException("Server with this id does not exist"));
 
     Room room = new Room(input.getName(), user, server, input.getType());
     return roomRepository.save(room);
