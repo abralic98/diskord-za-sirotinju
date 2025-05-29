@@ -3,6 +3,7 @@
 package com.example.demo.controller.user;
 
 import com.example.demo.controller.inputs.user.*;
+import com.example.demo.dto.user.UserPageDTO;
 import com.example.demo.model.User;
 import com.example.demo.service.user.UserService;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -29,8 +30,8 @@ public class UserController {
   }
 
   @QueryMapping
-  public List<User> getAllUsers() {
-    return (List<User>) userService.getAllUsers();
+  public UserPageDTO getAllUsers(@Argument int page, @Argument int size, @Argument String search) {
+    return userService.getAllUsers(page, size, search);
   }
 
   @QueryMapping

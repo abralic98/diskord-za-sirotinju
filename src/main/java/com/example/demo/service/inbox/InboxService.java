@@ -2,6 +2,7 @@
 package com.example.demo.service.inbox;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -31,9 +32,15 @@ public class InboxService {
     EndpointProtector.checkAuth();
     User currentUser = currentAuthenticatedUser.getUser();
     User joinedUser = userRepository.findById(withUserId)
-        .orElseThrow(() -> new ModifiedException("joined user not found"));
-    Inbox inbox = new Inbox(currentUser, joinedUser);
+        .orElseThrow(() -> new ModifiedException("Joined user not found"));
 
+    Optional<Inbox> existingInbox = inboxRepository.findDirectInboxBetween(currentUser, joinedUser);
+
+    if (existingInbox.isPresent()) {
+      return existingInbox.get();
+    }
+
+    Inbox inbox = new Inbox(currentUser, joinedUser);
     return inboxRepository.save(inbox);
   }
 

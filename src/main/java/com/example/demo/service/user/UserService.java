@@ -5,10 +5,15 @@ package com.example.demo.service.user;
 import com.example.demo.config.EndpointProtector;
 import com.example.demo.controller.global.ModifiedException;
 import com.example.demo.controller.inputs.user.*;
+import com.example.demo.dto.user.UserPageDTO;
 import com.example.demo.helpers.CurrentAuthenticatedUser;
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -115,9 +120,17 @@ public class UserService {
     }
   }
 
-  public Iterable<User> getAllUsers() {
+  public UserPageDTO getAllUsers(int page, int size, String search) {
     EndpointProtector.checkAuth();
-    return userRepository.findAll();
+    if (search == null) {
+      throw new ModifiedException("Search must include at least 1 letter");
+    }
+
+    Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "dateCreated"));
+    Page<User> userPage;
+
+    userPage = userRepository.findByUsernameContainingIgnoreCase(search.trim(), pageable);
+    return new UserPageDTO(userPage);
   }
 
   public User deactivateUser(Long id) {

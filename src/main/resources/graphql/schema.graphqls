@@ -2,7 +2,7 @@ scalar Long
 
 type Query {
   meQuery: User
-  getAllUsers: [User]
+  getAllUsers(page: Int!, size: Int!, search: String!): UserPage!
   getUserById(id: ID!): User
   getAllServers(page: Int!, size: Int!, search: String): ServerPage!
   getAllUserServers: [Server]
@@ -69,6 +69,14 @@ type BannedUser {
   dateCreated: String
   dateUpdated: String
   banAuthor: User!
+}
+
+type UserPage {
+  content: [User!]!
+  totalPages: Int!
+  totalElements: Int!
+  number: Int!
+  size: Int!
 }
 
 type UserWithToken {
