@@ -82,6 +82,10 @@ public class UserService {
       currentUser.setUserPresence(user.getUserPresence());
     }
 
+    if (user.getDescription() != null) {
+      currentUser.setDescription(user.getDescription());
+    }
+
     User updatedUser = userRepository.save(currentUser);
     currentAuthenticatedUser.refreshAuthentication(updatedUser);
     return updatedUser;

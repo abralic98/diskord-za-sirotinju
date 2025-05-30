@@ -29,6 +29,9 @@ public class User {
   private String email;
 
   @Column(nullable = true)
+  private String description;
+
+  @Column(nullable = true)
   private Long phoneNumber;
 
   @Column(nullable = false)
@@ -126,6 +129,14 @@ public class User {
 
   public Number getPhoneNumber() {
     return phoneNumber;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  public String getDescription() {
+    return description;
   }
 
   public void setDateCreated(Date dateCreated) {

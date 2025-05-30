@@ -25,7 +25,7 @@ public class CurrentAuthenticatedUser {
 
     Object principal = authentication.getPrincipal();
     if (!(principal instanceof Long)) {
-      throw new RuntimeException("Invalid authentication principal");
+      throw new RuntimeException("Invalid principal");
     }
 
     Long userId = (Long) principal;

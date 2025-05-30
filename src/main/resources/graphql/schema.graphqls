@@ -47,6 +47,7 @@ type Mutation {
   createInbox(withUserId: ID!): Inbox
   createDirectMessage(message: CreateDMInput): DirectMessage
   removeMeFromInbox(inboxId: ID!): Boolean
+  addUserToInbox(inboxId: ID!, userId: ID!): Inbox
 }
 
 type Subscription {
@@ -63,6 +64,7 @@ type User {
   phoneNumber: Long
   avatar: String
   userPresence: UserPresenceType
+  dateCreated: String
 }
 type BannedUser {
   user: User!
@@ -108,6 +110,7 @@ input UpdateUserInput {
   email: String
   phoneNumber: Long
   avatar: String
+  description: String
   userPresence: UserPresenceType
 }
 

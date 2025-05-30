@@ -31,6 +31,12 @@ public class InboxController {
     return inboxService.removeMeFromInbox(inboxId);
   }
 
+  // bice users ali kasnije
+  @MutationMapping
+  public Inbox addUserToInbox(@Argument Long inboxId, @Argument Long userId) {
+    return inboxService.addUserToInbox(inboxId, userId);
+  }
+
   @QueryMapping
   public List<Inbox> getMyInbox() {
     return inboxService.getMyInbox();

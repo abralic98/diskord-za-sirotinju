@@ -2,28 +2,18 @@ package com.example.demo.controller.inputs.user;
 
 import com.example.demo.model.enums.UserPresenceType;
 
-public class UpdateUserInput {
-  private String username;
-  private String email;
+public class UpdateUserInput extends CreateUserInput {
+  private String description;
   private Long phoneNumber;
   private String avatar;
   private UserPresenceType userPresence;
 
-  // Getters and setters
-  public String getUsername() {
-    return username;
+  public String getDescription() {
+    return description;
   }
 
-  public void setUsername(String username) {
-    this.username = username;
-  }
-
-  public String getEmail() {
-    return email;
-  }
-
-  public void setEmail(String email) {
-    this.email = email;
+  public void setDescription(String description) {
+    this.description = description;
   }
 
   public Long getPhoneNumber() {

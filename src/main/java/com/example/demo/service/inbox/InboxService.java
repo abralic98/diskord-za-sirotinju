@@ -64,6 +64,26 @@ public class InboxService {
     return true;
   }
 
+  public Inbox addUserToInbox(Long inboxId, Long userId) {
+    EndpointProtector.checkAuth();
+    User currentUser = currentAuthenticatedUser.getUser();
+
+    Inbox inbox = inboxRepository.findById(inboxId)
+        .orElseThrow(() -> new ModifiedException("Inbox not found"));
+
+    User userToAdd = userRepository.findById(userId).orElseThrow(() -> new ModifiedException("User not found"));
+
+    if (!inbox.getUsers().contains(currentUser)) {
+      throw new ModifiedException("You dont have permission to add user");
+    }
+    if (inbox.getUsers().contains(userToAdd)) {
+      throw new ModifiedException("User is already in this inbox");
+    }
+
+    inbox.getUsers().add(userToAdd);
+    return inboxRepository.save(inbox);
+  }
+
   public List<Inbox> getMyInbox() {
     EndpointProtector.checkAuth();
     User currentUser = currentAuthenticatedUser.getUser();
