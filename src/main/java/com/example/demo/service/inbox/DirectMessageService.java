@@ -40,7 +40,13 @@ public class DirectMessageService {
     User user = currentAuthenticatedUser.getUser();
     Inbox inbox = inboxRepository.findById(input.getInboxId())
         .orElseThrow(() -> new ModifiedException("Inbox with this id does not exist"));
-    DirectMessage message = new DirectMessage(input.getText(), input.getType(), inbox, user);
+
+    if ((input.getText() == null || input.getText().trim().isEmpty()) &&
+        (input.getImageUrl() == null || input.getImageUrl().trim().isEmpty())) {
+      throw new ModifiedException("Either text or imageUrl must be provided.");
+    }
+
+    DirectMessage message = new DirectMessage(input.getText(), input.getType(), input.getImageUrl(), inbox, user);
     dmPublisher.publish(input.getInboxId(), message);
     return dmRepository.save(message);
   }

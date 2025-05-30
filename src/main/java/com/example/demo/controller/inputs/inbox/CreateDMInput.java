@@ -8,6 +8,7 @@ public class CreateDMInput {
   private String text;
   private MessageType type;
   private Long inboxId;
+  private String imageUrl;
 
   public String getText() {
     return text;
@@ -31,6 +32,14 @@ public class CreateDMInput {
 
   public void setInboxId(Long inboxId) {
     this.inboxId = inboxId;
+  }
+
+  public String getImageUrl() {
+    return imageUrl;
+  }
+
+  public void setImageUrl(String imageUrl) {
+    this.imageUrl = imageUrl;
   }
 
 }

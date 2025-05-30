@@ -20,6 +20,9 @@ public class DirectMessage {
   @Column(nullable = false)
   private MessageType type;
 
+  @Column(nullable = true)
+  private String imageUrl;
+
   @ManyToOne
   @JoinColumn(name = "inbox_id", nullable = false)
   private Inbox inbox;
@@ -40,10 +43,11 @@ public class DirectMessage {
 
   }
 
-  public DirectMessage(String text, MessageType type, Inbox inbox, User author) {
+  public DirectMessage(String text, MessageType type, String imageUrl, Inbox inbox, User author) {
     this.text = text;
     this.type = type;
     this.inbox = inbox;
+    this.imageUrl = imageUrl;
     this.author = author;
     this.dateCreated = new Date();
     this.dateUpdated = new Date();

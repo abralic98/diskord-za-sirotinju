@@ -57,9 +57,10 @@ public class InboxService {
 
     inbox.getUsers().removeIf(user -> user.getId().equals(currentUser.getId()));
 
+    inboxRepository.save(inbox);
+
     if (inbox.getUsers().isEmpty()) {
       inboxRepository.delete(inbox);
-      return null;
     }
     return true;
   }

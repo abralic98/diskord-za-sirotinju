@@ -46,7 +46,7 @@ type Mutation {
   generateInviteLink(serverId: ID!): String
   createInbox(withUserId: ID!): Inbox
   createDirectMessage(message: CreateDMInput): DirectMessage
-  removeMeFromInbox(inboxId: ID!): Boolean
+  removeMeFromInbox(inboxId: ID!): Boolean 
   addUserToInbox(inboxId: ID!, userId: ID!): Inbox
 }
 
@@ -253,6 +253,7 @@ type DirectMessage {
   author: User
   inbox: Inbox
   type: MessageType
+  imageUrl: String
   dateCreated: String
   dateUpdated: String
 }
@@ -261,6 +262,7 @@ input CreateDMInput {
   text: String!
   type: MessageType!
   inboxId: ID!
+  imageUrl: String
 }
 
 type DirectMessagePage {
