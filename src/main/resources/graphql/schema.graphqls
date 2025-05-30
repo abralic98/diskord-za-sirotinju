@@ -189,7 +189,7 @@ type Message {
   id: ID
   author: User
   text: String
-  imgPath: String
+  imageUrl: String
   type: MessageType
   dateCreated: String
   dateUpdated: String
@@ -232,6 +232,7 @@ input CreateMessageInput {
   text: String!
   type: MessageType!
   roomId: ID!
+  imageUrl: String
 }
 
 ####################################

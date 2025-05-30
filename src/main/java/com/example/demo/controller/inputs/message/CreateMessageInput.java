@@ -7,6 +7,7 @@ public class CreateMessageInput {
   private String text;
   private MessageType type;
   private Long roomId;
+  private String imageUrl;
 
   public String getText() {
     return text;
@@ -30,6 +31,14 @@ public class CreateMessageInput {
 
   public void setRoomId(Long roomId) {
     this.roomId = roomId;
+  }
+
+  public String getImageUrl() {
+    return imageUrl;
+  }
+
+  public void setImageUrl(String imageUrl) {
+    this.imageUrl = imageUrl;
   }
 
 }

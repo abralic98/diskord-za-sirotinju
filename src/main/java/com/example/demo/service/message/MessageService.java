@@ -40,9 +40,22 @@ public class MessageService {
   public Message createMessage(CreateMessageInput input) {
     EndpointProtector.checkAuth();
     User user = currentAuthenticatedUser.getUser();
+
     Room room = roomRepository.findById(input.getRoomId())
         .orElseThrow(() -> new ModifiedException("Room with this id does not exist"));
-    Message message = new Message(input.getText(), input.getType(), room, user);
+
+    if ((input.getText() == null || input.getText().trim().isEmpty()) &&
+        (input.getImageUrl() == null || input.getImageUrl().trim().isEmpty())) {
+      throw new ModifiedException("Either text or imageUrl must be provided.");
+    }
+
+    Message message = new Message(
+        input.getText(),
+        input.getType(),
+        input.getImageUrl(),
+        room,
+        user);
+
     messagePublisher.publish(input.getRoomId(), message);
     return messageRepository.save(message);
   }

@@ -21,6 +21,9 @@ public class Message {
   @Column(nullable = false)
   private MessageType type;
 
+  @Column(nullable = true)
+  private String imageUrl;
+
   @ManyToOne
   @JoinColumn(name = "room_id", nullable = false)
   private Room room;
@@ -33,7 +36,6 @@ public class Message {
   @Column(nullable = false, updatable = false)
   private Date dateCreated;
 
-
   @Temporal(TemporalType.TIMESTAMP)
   @Column(nullable = false)
   private Date dateUpdated;
@@ -42,9 +44,10 @@ public class Message {
 
   }
 
-  public Message(String text, MessageType type, Room room, User author) {
+  public Message(String text, MessageType type, String imageUrl, Room room, User author) {
     this.text = text;
     this.type = type;
+    this.imageUrl = imageUrl;
     this.room = room;
     this.author = author;
     this.dateCreated = new Date();
