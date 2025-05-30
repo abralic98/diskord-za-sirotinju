@@ -29,9 +29,9 @@ public class DirectMessageController {
 
   //
   @QueryMapping
-  public DirectMessagePageDTO getMessagesByInboxId(@Argument Long id, @Argument int page, @Argument int size,
+  public DirectMessagePageDTO getDirectMessagesByInboxId(@Argument Long id, @Argument int page, @Argument int size,
       @Argument String search) {
-    return dmService.getMessagesByInboxId(id, page, size, search);
+    return dmService.getDirectMessagesByInboxId(id, page, size, search);
   }
 
   @SubscriptionMapping

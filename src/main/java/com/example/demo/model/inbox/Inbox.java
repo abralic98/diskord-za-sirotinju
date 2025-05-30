@@ -63,6 +63,14 @@ public class Inbox {
     this.users = users;
   }
 
+  public Date getDateCreated() {
+    return dateCreated;
+  }
+
+  public void setDateCreated(Date date) {
+    this.dateCreated = date;
+  }
+
   @PrePersist
   protected void onCreate() {
     dateCreated = new Date();

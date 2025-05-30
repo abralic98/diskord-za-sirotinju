@@ -52,7 +52,8 @@ public class InboxService {
 
   public Inbox getInboxById(Long id) {
     EndpointProtector.checkAuth();
-    return inboxRepository.getById(id);
+    Inbox inbox = inboxRepository.findById(id).orElseThrow(()-> new ModifiedException("No inbox with that id"));
+    return inbox;
   }
 
 }

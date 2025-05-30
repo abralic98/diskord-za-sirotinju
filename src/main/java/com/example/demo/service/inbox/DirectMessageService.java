@@ -45,7 +45,7 @@ public class DirectMessageService {
     return dmRepository.save(message);
   }
 
-  public DirectMessagePageDTO getMessagesByInboxId(Long inboxId, int page, int size, String search) {
+  public DirectMessagePageDTO getDirectMessagesByInboxId(Long inboxId, int page, int size, String search) {
     EndpointProtector.checkAuth();
     User user = currentAuthenticatedUser.getUser();
 
