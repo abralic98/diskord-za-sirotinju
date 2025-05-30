@@ -46,6 +46,7 @@ type Mutation {
   generateInviteLink(serverId: ID!): String
   createInbox(withUserId: ID!): Inbox
   createDirectMessage(message: CreateDMInput): DirectMessage
+  removeMeFromInbox(inboxId: ID!): Boolean
 }
 
 type Subscription {

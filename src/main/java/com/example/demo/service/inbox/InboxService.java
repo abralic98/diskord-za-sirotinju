@@ -34,6 +34,10 @@ public class InboxService {
     User joinedUser = userRepository.findById(withUserId)
         .orElseThrow(() -> new ModifiedException("Joined user not found"));
 
+    if (currentUser.getId().equals(joinedUser.getId())) {
+      throw new ModifiedException("You cannot create DM with yourself");
+    }
+
     Optional<Inbox> existingInbox = inboxRepository.findDirectInboxBetween(currentUser, joinedUser);
 
     if (existingInbox.isPresent()) {
@@ -44,6 +48,22 @@ public class InboxService {
     return inboxRepository.save(inbox);
   }
 
+  public Boolean removeMeFromInbox(Long inboxId) {
+    EndpointProtector.checkAuth();
+    User currentUser = currentAuthenticatedUser.getUser();
+
+    Inbox inbox = inboxRepository.findById(inboxId)
+        .orElseThrow(() -> new ModifiedException("Inbox not found"));
+
+    inbox.getUsers().removeIf(user -> user.getId().equals(currentUser.getId()));
+
+    if (inbox.getUsers().isEmpty()) {
+      inboxRepository.delete(inbox);
+      return null;
+    }
+    return true;
+  }
+
   public List<Inbox> getMyInbox() {
     EndpointProtector.checkAuth();
     User currentUser = currentAuthenticatedUser.getUser();
@@ -52,7 +72,7 @@ public class InboxService {
 
   public Inbox getInboxById(Long id) {
     EndpointProtector.checkAuth();
-    Inbox inbox = inboxRepository.findById(id).orElseThrow(()-> new ModifiedException("No inbox with that id"));
+    Inbox inbox = inboxRepository.findById(id).orElseThrow(() -> new ModifiedException("No inbox with that id"));
     return inbox;
   }
 

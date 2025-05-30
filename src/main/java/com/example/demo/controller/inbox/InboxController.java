@@ -26,6 +26,11 @@ public class InboxController {
     return inboxService.createInbox(withUserId);
   }
 
+  @MutationMapping
+  public Boolean removeMeFromInbox(@Argument Long inboxId) {
+    return inboxService.removeMeFromInbox(inboxId);
+  }
+
   @QueryMapping
   public List<Inbox> getMyInbox() {
     return inboxService.getMyInbox();

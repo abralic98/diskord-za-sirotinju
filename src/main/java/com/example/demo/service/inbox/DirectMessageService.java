@@ -68,6 +68,9 @@ public class DirectMessageService {
   }
 
   public Flux<DirectMessage> subscribeToMessagesByInboxId(Long inboxId) {
+    // EndpointProtector.checkAuth();
+    // User user = currentAuthenticatedUser.getUser();
+
     return dmPublisher.subscribe(inboxId);
   }
 
