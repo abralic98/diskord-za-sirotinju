@@ -12,7 +12,6 @@ import com.example.demo.controller.inputs.server.KickUserInput;
 import com.example.demo.controller.inputs.server.UnbanUserInput;
 import com.example.demo.controller.inputs.server.UpdateServerInput;
 import com.example.demo.dto.server.ServerPageDTO;
-import com.example.demo.model.User;
 import com.example.demo.model.server.Server;
 import com.example.demo.model.user.BannedUser;
 import com.example.demo.service.server.ServerService;

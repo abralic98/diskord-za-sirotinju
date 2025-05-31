@@ -48,7 +48,9 @@ public class SecurityConfig {
   @Bean
   public UrlBasedCorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration corsConfig = new CorsConfiguration();
-    corsConfig.setAllowedOrigins(Arrays.asList("http://localhost:3000")); // Frontend URL
+    corsConfig.setAllowedOrigins(Arrays.asList(
+        "http://localhost:3000",
+        "https://ezcomms.linkpc.net"));
     corsConfig.setAllowedMethods(Arrays.asList("GET", "POST", "OPTIONS")); // Allowed HTTP methods
     corsConfig.setAllowedHeaders(Arrays.asList("*")); // Allow all headers
     corsConfig.setAllowCredentials(true); // Allow credentials (cookies or authorization headers)

@@ -1,4 +1,3 @@
-// U SERVICE RADIMO LOGIKU
 package com.example.demo.service.server;
 
 import com.example.demo.config.EndpointProtector;
@@ -17,8 +16,12 @@ import com.example.demo.model.user.BannedUser;
 import com.example.demo.repository.ServerInviteRepository;
 import com.example.demo.repository.ServerRepository;
 import com.example.demo.repository.UserRepository;
+
+import jakarta.servlet.http.HttpServletRequest;
+
 import com.example.demo.controller.global.ModifiedException;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -30,6 +33,8 @@ import java.util.List;
 
 @Service
 public class ServerService {
+  @Value("${app.frontend-base-url}")
+  private String frontendBaseUrl;
 
   private final ServerRepository serverRepository;
   private final CurrentAuthenticatedUser currentAuthenticatedUser;
@@ -267,8 +272,7 @@ public class ServerService {
 
     ServerInvite invite = new ServerInvite(server, 60);
     serverInviteRepository.save(invite);
-
-    return "http://localhost:3000/invite/" + invite.getToken();
+    return frontendBaseUrl + "/invite/" + invite.getToken();
   }
 
   public Server joinServerWithInvite(String token) {
@@ -292,7 +296,7 @@ public class ServerService {
     return server;
   }
 
-  public Server getServerByInviteToken(String token){
+  public Server getServerByInviteToken(String token) {
     EndpointProtector.checkAuth();
     ServerInvite invite = serverInviteRepository.findByToken(token)
         .orElseThrow(() -> new RuntimeException("Invalid invite"));
@@ -300,4 +304,5 @@ public class ServerService {
     return server;
 
   }
+
 }

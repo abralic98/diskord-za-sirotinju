@@ -6,14 +6,14 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
-
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        // Define CORS settings for GraphQL endpoint
-        registry.addMapping("/graphql")  // You can target specific paths
-                .allowedOrigins("http://localhost:3000")  // Frontend URL
-                .allowedMethods("GET", "POST")  // Allow specific HTTP methods
-                .allowedHeaders("*")  // Allow any headers
-                .allowCredentials(true);  // Allow credentials such as cookies or authorization headers
-    }
+  @Override
+  public void addCorsMappings(CorsRegistry registry) {
+    registry.addMapping("/**")
+        .allowedOrigins(
+            "http://localhost:3000",
+            "https://ezcomms.linkpc.net")
+        .allowedMethods("GET", "POST", "OPTIONS")
+        .allowedHeaders("*")
+        .allowCredentials(true);
+  }
 }
