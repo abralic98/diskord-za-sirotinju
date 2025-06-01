@@ -62,6 +62,7 @@ type User {
   username: String
   email: String
   phoneNumber: Long
+  description: String
   avatar: String
   userPresence: UserPresenceType
   dateCreated: String

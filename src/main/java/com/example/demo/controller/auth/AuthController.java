@@ -6,6 +6,7 @@ import com.example.demo.controller.global.ModifiedException;
 import com.example.demo.controller.inputs.user.CreateSessionInput;
 import com.example.demo.model.User;
 import com.example.demo.model.UserWithToken;
+import com.example.demo.model.enums.UserPresenceType;
 import com.example.demo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
@@ -29,22 +30,21 @@ public class AuthController {
 
   // GraphQL Mutation to handle login
   @MutationMapping
-  public UserWithToken createSession(@Argument CreateSessionInput credentials) { // Use @Argument here instead of
-                                                                                 // @RequestBody
+  public UserWithToken createSession(@Argument CreateSessionInput credentials) {
+
     String username = credentials.getUsername();
     String password = credentials.getPassword();
 
     // Validate the credentials
     User user = userRepository.findByUsername(username).orElseThrow(() -> new ModifiedException("User Not Found"));
-    System.out.println("u mog str");
     Boolean isPasswordCorrect = passwordEncoder.matches(password, user.getPassword());
     if (!isPasswordCorrect) {
       throw new ModifiedException("Invalid credentials");
     }
     if (user != null && isPasswordCorrect) {
       String token = jwtUtil.generateToken(username, user.getId());
-
-      // Return UserWithToken containing both user and token
+      user.setUserPresence(UserPresenceType.ONLINE);
+      userRepository.save(user);
       UserWithToken userWithToken = new UserWithToken();
       userWithToken.setUser(user);
       userWithToken.setToken(token);

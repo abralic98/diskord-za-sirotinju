@@ -1,5 +1,3 @@
-
-// U KONTROLERU PISEMO KVERIJE 
 package com.example.demo.controller.user;
 
 import com.example.demo.controller.inputs.user.*;
@@ -11,7 +9,6 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.stereotype.Controller;
 
-import java.util.List;
 import java.util.Optional;
 
 @Controller // Marks this class as a GraphQL controller
