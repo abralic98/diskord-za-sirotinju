@@ -16,7 +16,7 @@ public class VoiceWebSocketHandler extends TextWebSocketHandler {
   private final Map<WebSocketSession, String> sessionUserMap = new ConcurrentHashMap<>();
   private final Map<String, String> userRoomMap = new ConcurrentHashMap<>();
   private final ObjectMapper mapper = new ObjectMapper();
-  private final UserRepository userRepository; // Add this
+  private final UserRepository userRepository; 
 
   public VoiceWebSocketHandler(UserRepository userRepository) {
     this.userRepository = userRepository;
