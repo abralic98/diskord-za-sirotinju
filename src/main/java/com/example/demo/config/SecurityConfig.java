@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
 
 import java.util.Arrays;
 
@@ -22,41 +21,36 @@ import java.util.Arrays;
 public class SecurityConfig {
 
   @Autowired
-  private JwtUtil jwtUtil; // Inject JwtUtil into the SecurityConfig class
+  private JwtUtil jwtUtil;
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    // Use Lambda DSL for cleaner and modern configuration
     http
-        .csrf(csrf -> csrf.disable()) // Disable CSRF protection (if needed)
-        .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Enable and configure CORS
+        .csrf(csrf -> csrf.disable())
+        .cors(cors -> cors.configurationSource(corsConfigurationSource()))
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/auth/**").permitAll() // Allow login endpoint
-            .requestMatchers("/graphql").permitAll() // GraphQL will check inside resolver
-            .requestMatchers("/graphiql", "/vendor/**", "/static/**").permitAll() // GraphiQL frontend
-            .requestMatchers("/ws/**").permitAll() // Allow WebSocket endpoint without auth
-            .anyRequest().authenticated()) // Require authentication for other requests
-        .addFilterBefore(new JwtAuthenticationFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class); // Pass
-                                                                                                            // JwtUtil
-                                                                                                            // to the
-                                                                                                            // filter
+            .requestMatchers("/auth/**").permitAll()
+            .requestMatchers("/graphql").permitAll()
+            .requestMatchers("/graphiql", "/vendor/**", "/static/**").permitAll()
+            .requestMatchers("/ws/**").permitAll() // za sad bez autha
+            .anyRequest().authenticated())
+        .addFilterBefore(new JwtAuthenticationFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
   }
 
-  // Create the CORS configuration source to be used in the Lambda DSL
   @Bean
   public UrlBasedCorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration corsConfig = new CorsConfiguration();
     corsConfig.setAllowedOrigins(Arrays.asList(
         "http://localhost:3000",
         "https://ezcomms.linkpc.net"));
-    corsConfig.setAllowedMethods(Arrays.asList("GET", "POST", "OPTIONS")); // Allowed HTTP methods
-    corsConfig.setAllowedHeaders(Arrays.asList("*")); // Allow all headers
-    corsConfig.setAllowCredentials(true); // Allow credentials (cookies or authorization headers)
+    corsConfig.setAllowedMethods(Arrays.asList("GET", "POST", "OPTIONS"));
+    corsConfig.setAllowedHeaders(Arrays.asList("*"));
+    corsConfig.setAllowCredentials(true);
 
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-    source.registerCorsConfiguration("/**", corsConfig); // Apply CORS config globally
+    source.registerCorsConfiguration("/**", corsConfig);
 
     return source;
   }

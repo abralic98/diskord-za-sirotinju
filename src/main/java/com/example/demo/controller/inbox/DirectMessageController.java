@@ -27,7 +27,6 @@ public class DirectMessageController {
     return dmService.createDirectMessage(message);
   }
 
-  //
   @QueryMapping
   public DirectMessagePageDTO getDirectMessagesByInboxId(@Argument Long id, @Argument int page, @Argument int size,
       @Argument String search) {

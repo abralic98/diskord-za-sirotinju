@@ -13,8 +13,8 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-  private static final String SECRET_KEY = "your_super_secret_key_that_is_long_enough_123456"; // must be at least 256
-                                                                                               // bits
+  // kasnije prebaci normalan key u env
+  private static final String SECRET_KEY = "your_super_secret_key_that_is_long_enough_123456";
 
   private Key getSigningKey() {
     return Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
@@ -24,9 +24,9 @@ public class JwtUtil {
     Instant now = Instant.now();
     return Jwts.builder()
         .setSubject(username)
-        .claim("userId", userId) // Include userId in the token claims
+        .claim("userId", userId)
         .setIssuedAt(Date.from(now))
-        .setExpiration(Date.from(now.plusSeconds(86400))) // 1 day
+        .setExpiration(Date.from(now.plusSeconds(86400))) // 1 aday 
         .signWith(getSigningKey(), SignatureAlgorithm.HS256)
         .compact();
   }
@@ -46,12 +46,12 @@ public class JwtUtil {
         .build()
         .parseClaimsJws(token)
         .getBody()
-        .get("userId", Long.class); // Extract userId from the claims
+        .get("userId", Long.class);
   }
 
   public boolean validateToken(String token) {
     try {
-      extractUsername(token); // Validate username first
+      extractUsername(token);
       return true;
     } catch (JwtException e) {
       return false;

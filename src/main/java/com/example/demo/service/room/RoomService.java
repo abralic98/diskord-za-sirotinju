@@ -56,18 +56,6 @@ public class RoomService {
     return roomRepository.save(room);
   }
 
-  // public List<Room> getRoomsByServerId(Long id) {
-  // EndpointProtector.checkAuth();
-  // User user = currentAuthenticatedUser.getUser();
-  // Server server = serverRepository.findById(id).orElseThrow(() -> new
-  // ModifiedException("Server not found"));
-  // if (!server.getJoinedUsers().contains(user)) {
-  // throw new ModifiedException("Access denied: user has not joined this
-  // server");
-  // }
-  // List<Room> rooms = roomRepository.findByServerId(id);
-  // return rooms;
-  // }
   public Rooms getRoomsByServerId(Long id) {
     EndpointProtector.checkAuth();
     User user = currentAuthenticatedUser.getUser();

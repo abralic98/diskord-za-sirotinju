@@ -28,14 +28,12 @@ public class AuthController {
   @Autowired
   private PasswordEncoder passwordEncoder;
 
-  // GraphQL Mutation to handle login
   @MutationMapping
   public UserWithToken createSession(@Argument CreateSessionInput credentials) {
 
     String username = credentials.getUsername();
     String password = credentials.getPassword();
 
-    // Validate the credentials
     User user = userRepository.findByUsername(username).orElseThrow(() -> new ModifiedException("User Not Found"));
     Boolean isPasswordCorrect = passwordEncoder.matches(password, user.getPassword());
     if (!isPasswordCorrect) {

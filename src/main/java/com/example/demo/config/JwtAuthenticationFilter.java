@@ -14,9 +14,8 @@ import java.util.Collections;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-  private final JwtUtil jwtUtil; // JwtUtil injected via constructor
+  private final JwtUtil jwtUtil; 
 
-  // Constructor injection for JwtUtil
   public JwtAuthenticationFilter(JwtUtil jwtUtil) {
     this.jwtUtil = jwtUtil;
   }
@@ -33,7 +32,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       String token = authHeader.substring(7);
       if (jwtUtil.validateToken(token)) {
         String username = jwtUtil.extractUsername(token);
-        Long userId = jwtUtil.extractUserId(token); // Assuming you add a method to extract the user ID from the token
+        Long userId = jwtUtil.extractUserId(token); 
 
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userId, null,
             Collections.emptyList());

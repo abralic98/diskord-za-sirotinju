@@ -5,7 +5,6 @@ public class CreateUserInput {
   private String password;
   private String email;
 
-  // Getters and setters
   public String getUsername() {
     return username;
   }

@@ -23,7 +23,6 @@ public class MessagePublisher {
     }
   }
 
-  // napravi novi sink ako zatrazi konekciju nakon refresha frontend bug
   public Flux<Message> subscribe(Long roomId) {
     return sinks.compute(roomId, (id, existingSink) -> {
       if (existingSink == null || existingSink.currentSubscriberCount() == 0) {

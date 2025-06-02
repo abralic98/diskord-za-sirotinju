@@ -145,7 +145,6 @@ public class ServerService {
     EndpointProtector.checkAuth();
 
     User user = currentAuthenticatedUser.getUser();
-    // ako posaljes random string kao id npr lalalala on pukne ne znam to resolvat
     Server server = serverRepository.findById(input.getServerId())
         .orElseThrow(() -> new ModifiedException("Server not found"));
 

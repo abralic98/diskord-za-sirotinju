@@ -11,12 +11,11 @@ import org.springframework.stereotype.Controller;
 
 import java.util.Optional;
 
-@Controller // Marks this class as a GraphQL controller
+@Controller
 public class UserController {
 
   private final UserService userService;
 
-  // Constructor injection of UserService
   public UserController(UserService userService) {
     this.userService = userService;
   }

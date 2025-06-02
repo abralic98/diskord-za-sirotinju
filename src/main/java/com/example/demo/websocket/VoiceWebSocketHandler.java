@@ -18,16 +18,14 @@ public class VoiceWebSocketHandler extends TextWebSocketHandler {
   private final ObjectMapper mapper = new ObjectMapper();
   private final UserRepository userRepository; // Add this
 
-  // Add constructor to inject UserRepository
   public VoiceWebSocketHandler(UserRepository userRepository) {
     this.userRepository = userRepository;
   }
 
   @Override
   public void afterConnectionEstablished(WebSocketSession session) {
-    System.out.println("🟢 Connected: " + session.getId());
-    sessionUserMap.put(session, "temp"); // Temporary placeholder
-    // Send current presence for all rooms
+    System.out.println("Connected: " + session.getId());
+    sessionUserMap.put(session, "temp");
     rooms.forEach((roomId, peers) -> {
       if (peers.contains(session)) {
         broadcastPresence(roomId);
@@ -85,7 +83,7 @@ public class VoiceWebSocketHandler extends TextWebSocketHandler {
 
   @Override
   public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
-    System.out.println("🔴 Disconnected: " + session.getId());
+    System.out.println("Disconnected: " + session.getId());
 
     String userId = sessionUserMap.remove(session);
     if (userId != null) {
@@ -108,7 +106,6 @@ public class VoiceWebSocketHandler extends TextWebSocketHandler {
   private void sendRoomPresence(String roomId) {
     List<WebSocketSession> peers = rooms.getOrDefault(roomId, Collections.emptyList());
 
-    // Create a list of user details instead of just IDs
     List<Map<String, Object>> userDetails = peers.stream()
         .map(sessionUserMap::get)
         .filter(Objects::nonNull)

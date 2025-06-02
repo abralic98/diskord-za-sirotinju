@@ -1,5 +1,4 @@
 
-// U SERVICE RADIMO LOGIKU
 package com.example.demo.service.user;
 
 import com.example.demo.config.EndpointProtector;
@@ -20,14 +19,13 @@ import org.springframework.stereotype.Service;
 import java.util.Objects;
 import java.util.Optional;
 
-@Service // Marks this class as a Spring service
+@Service 
 public class UserService {
 
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
   private final CurrentAuthenticatedUser currentAuthenticatedUser;
 
-  // Constructor-based dependency injection
   public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder,
       CurrentAuthenticatedUser currentAuthenticatedUser) {
     this.userRepository = userRepository;

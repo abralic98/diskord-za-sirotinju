@@ -4,7 +4,6 @@ public class UserWithToken {
     private String token;
     private User user;
 
-    // Getters and setters
     public String getToken() {
         return token;
     }

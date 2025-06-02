@@ -28,12 +28,9 @@ public class Room {
   @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Message> messages;
 
-
-  // Many rooms belong to one server
   @ManyToOne
   @JoinColumn(name = "server_id", nullable = false)
   private Server server;
-
 
   @ManyToOne
   @JoinColumn(name = "created_by", nullable = false)
@@ -80,18 +77,15 @@ public class Room {
     return type;
   }
 
-
-  @PrePersist // This method is called before the entity is persisted (inserted) into the
-              // database, ensuring that dateCreated is set when a new user is created.
+  @PrePersist
   protected void onCreate() {
     dateCreated = new Date();
-    dateUpdated = new Date(); // Set dateUpdated to the current date when the entity is first created
+    dateUpdated = new Date();
   }
 
-  @PreUpdate // This method is called before the entity is updated in the database, ensuring
-             // that dateUpdated is updated whenever the entity is modified.
+  @PreUpdate
   protected void onUpdate() {
-    dateUpdated = new Date(); // Update dateUpdated whenever the entity is updated
+    dateUpdated = new Date();
   }
 
 }

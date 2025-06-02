@@ -20,6 +20,6 @@ public class GraphQLExceptionHandler extends DataFetcherExceptionResolverAdapter
           .build();
     }
 
-    return null; // Let Spring handle other exceptions as INTERNAL_ERROR
+    return null;
   }
 }
