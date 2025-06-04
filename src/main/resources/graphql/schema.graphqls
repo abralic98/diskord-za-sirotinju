@@ -31,7 +31,7 @@ type Mutation {
   createUser(user: CreateUserInput): User
   updateUser(user: UpdateUserInput): User
   updateUserPassword(credentials: UpdateUserPasswordInput): User
-  deactivateUser(id: ID): User
+  deactivateUser(password: String!, confirmPassword: String!): User
   createSession(credentials: CreateSessionInput): UserWithToken
   createServer(server: CreateServerInput): Server
   updateServer(server: UpdateServerInput): Server
@@ -46,7 +46,7 @@ type Mutation {
   generateInviteLink(serverId: ID!): String
   createInbox(withUserId: ID!): Inbox
   createDirectMessage(message: CreateDMInput): DirectMessage
-  removeMeFromInbox(inboxId: ID!): Boolean 
+  removeMeFromInbox(inboxId: ID!): Boolean
   addUserToInbox(inboxId: ID!, userId: ID!): Inbox
 }
 

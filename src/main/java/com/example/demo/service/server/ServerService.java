@@ -13,6 +13,7 @@ import com.example.demo.model.User;
 import com.example.demo.model.invite.ServerInvite;
 import com.example.demo.model.server.Server;
 import com.example.demo.model.user.BannedUser;
+import com.example.demo.repository.BannedUserRepository;
 import com.example.demo.repository.ServerInviteRepository;
 import com.example.demo.repository.ServerRepository;
 import com.example.demo.repository.UserRepository;
@@ -30,6 +31,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ServerService {
@@ -40,13 +42,16 @@ public class ServerService {
   private final CurrentAuthenticatedUser currentAuthenticatedUser;
   private final UserRepository userRepository;
   private final ServerInviteRepository serverInviteRepository;
+  private final BannedUserRepository bannedUserRepository;
 
   public ServerService(ServerRepository serverRepository, CurrentAuthenticatedUser currentAuthenticatedUser,
-      UserRepository userRepository, ServerInviteRepository serverInviteRepository) {
+      UserRepository userRepository, ServerInviteRepository serverInviteRepository,
+      BannedUserRepository bannedUserRepository) {
     this.serverRepository = serverRepository;
     this.currentAuthenticatedUser = currentAuthenticatedUser;
     this.userRepository = userRepository;
     this.serverInviteRepository = serverInviteRepository;
+    this.bannedUserRepository = bannedUserRepository;
   }
 
   public Server createServer(CreateServerInput serverInput) {
@@ -97,14 +102,17 @@ public class ServerService {
 
   public ServerPageDTO getAllServers(int page, int size, String search) {
     EndpointProtector.checkAuth();
+    User user = currentAuthenticatedUser.getUser();
     Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "name"));
 
     Page<Server> serverPage;
 
+    List<Long> bannedServerIds = bannedUserRepository.findBannedServerIdsByUserId(user.getId());
+
     if (search != null && !search.trim().isEmpty()) {
-      serverPage = serverRepository.findByPublicServerTrueAndNameContainingIgnoreCase(search.trim(), pageable);
+      serverPage = serverRepository.findByNameAndNotBanned(search.trim(), bannedServerIds, pageable);
     } else {
-      serverPage = serverRepository.findByPublicServerTrue(pageable);
+      serverPage = serverRepository.findAllPublicAndNotBanned(bannedServerIds, pageable);
     }
 
     return new ServerPageDTO(serverPage);
@@ -177,6 +185,10 @@ public class ServerService {
 
     if (!permissionCheck) {
       throw new ModifiedException("You dont have permission to ban");
+    }
+
+    if (user.getId().equals(input.getUserId())) {
+      throw new ModifiedException("You cannot ban yourself");
     }
 
     User userToBeBanned = userRepository.findById(input.getUserId())
@@ -280,14 +292,22 @@ public class ServerService {
     ServerInvite invite = serverInviteRepository.findByToken(token)
         .orElseThrow(() -> new ModifiedException("Invalid invite"));
 
+    Server server = invite.getServer();
+
+    Optional<BannedUser> bannedUser = bannedUserRepository.findByUserAndServer(user, server);
+
+    if (bannedUser.isPresent()) {
+      throw new ModifiedException("You are banned from this server");
+    }
+
     if (invite.getExpiresAt().before(new Date())) {
       throw new ModifiedException("Invite expired");
     }
 
-    Server server = invite.getServer();
     if (server.getJoinedUsers().contains(user)) {
       throw new ModifiedException("User has already joined to this server");
     }
+
     if (!server.getJoinedUsers().contains(user)) {
       server.getJoinedUsers().add(user);
       serverRepository.save(server);

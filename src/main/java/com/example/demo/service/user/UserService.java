@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
 import java.util.Objects;
 import java.util.Optional;
 
-@Service 
+@Service
 public class UserService {
 
   private final UserRepository userRepository;
@@ -135,18 +135,26 @@ public class UserService {
     return new UserPageDTO(userPage);
   }
 
-  public User deactivateUser(Long id) {
-    Optional<User> user = userRepository.findById(id);
-    if (user.isPresent()) {
-      User currentUser = user.get();
-      if (!currentUser.getIsUserActive()) {
-        throw new ModifiedException("User already deactivated");
-      }
-      currentUser.setActivateUser(false);
-      return userRepository.save(currentUser);
-    } else {
-      throw new ModifiedException("User not found");
+  public User deactivateUser(String password, String confirmPassword) {
+    EndpointProtector.checkAuth();
+    User currentUser = currentAuthenticatedUser.getUser();
+    if (currentUser.getIsUserActive()) {
+      throw new ModifiedException("User allready deactivated");
     }
-  }
 
+    if (password == null) {
+      throw new ModifiedException("New password must not be null");
+    }
+
+    if (!Objects.equals(password, confirmPassword)) {
+      throw new ModifiedException("Password and Confirm password must match!");
+    }
+
+    Boolean isPasswordCorrect = passwordEncoder.matches(password, currentUser.getPassword());
+    if (!isPasswordCorrect) {
+      throw new ModifiedException("Invalid current password");
+    }
+    currentUser.setActivateUser(false);
+    return userRepository.save(currentUser);
+  }
 }

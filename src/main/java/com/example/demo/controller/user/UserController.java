@@ -51,8 +51,8 @@ public class UserController {
   }
 
   @MutationMapping
-  public User deactivateUser(@Argument Long id) {
-    return userService.deactivateUser(id);
+  public User deactivateUser(@Argument String password, @Argument String confirmPassword) {
+    return userService.deactivateUser(password, confirmPassword);
   }
 
 }
