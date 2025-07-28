@@ -56,8 +56,14 @@ public class MessageService {
         room,
         user);
 
-    messagePublisher.publish(input.getRoomId(), message);
-    return messageRepository.save(message);
+    // Save first to get ID
+    Message savedMessage = messageRepository.save(message);
+
+    // Now publish with the saved message (has ID)
+    messagePublisher.publish(input.getRoomId(), savedMessage);
+
+    // Return saved message as response
+    return savedMessage;
   }
 
   public MessagePageDTO getMessagesByRoomId(Long roomId, int page, int size, String search) {
