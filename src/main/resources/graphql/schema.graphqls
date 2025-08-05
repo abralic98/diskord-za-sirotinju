@@ -25,6 +25,13 @@ type Query {
     size: Int!
     search: String
   ): DirectMessagePage!
+  # advancedMessageSearch(
+  #   roomId: ID!
+  #   filters: MessageFilters
+  #   search: String
+  #   page: Int!
+  #   size: Int!
+  # ): MessagePage
 }
 
 type Mutation {

@@ -165,6 +165,10 @@ public class ServerService {
     User userToBeKicked = userRepository.findById(input.getUserId())
         .orElseThrow(() -> new ModifiedException("User not found"));
 
+    if (userToBeKicked.equals(user)) {
+      throw new ModifiedException("You cannot kick yourself");
+    }
+
     if (!server.getJoinedUsers().contains(userToBeKicked)) {
       throw new ModifiedException("User cannot be kicked since its not on the server");
     }

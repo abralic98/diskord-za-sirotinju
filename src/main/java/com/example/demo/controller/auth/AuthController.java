@@ -42,6 +42,7 @@ public class AuthController {
     if (user != null && isPasswordCorrect) {
       String token = jwtUtil.generateToken(username, user.getId());
       user.setUserPresence(UserPresenceType.ONLINE);
+      user.setActivateUser(true);
       userRepository.save(user);
       UserWithToken userWithToken = new UserWithToken();
       userWithToken.setUser(user);
