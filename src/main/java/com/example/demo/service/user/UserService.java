@@ -138,7 +138,7 @@ public class UserService {
   public User deactivateUser(String password, String confirmPassword) {
     EndpointProtector.checkAuth();
     User currentUser = currentAuthenticatedUser.getUser();
-    if (currentUser.getIsUserActive()) {
+    if (!currentUser.getIsUserActive()) {
       throw new ModifiedException("User allready deactivated");
     }
 
