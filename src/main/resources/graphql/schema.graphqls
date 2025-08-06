@@ -251,6 +251,7 @@ type Inbox {
   id: ID
   messages: [DirectMessage]
   users: [User]
+  lastMessage: DirectMessage
   dateCreated: String
   dateUpdated: String
 }

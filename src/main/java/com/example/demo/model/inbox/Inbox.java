@@ -24,6 +24,10 @@ public class Inbox {
   @JoinTable(name = "inbox_users", joinColumns = @JoinColumn(name = "inbox_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
   private List<User> users = new ArrayList<>();
 
+  @OneToOne
+  @JoinColumn(name = "last_message_id")
+  private DirectMessage lastMessage;
+
   @Temporal(TemporalType.TIMESTAMP)
   @Column(nullable = false, updatable = false)
   private Date dateCreated;
@@ -61,6 +65,14 @@ public class Inbox {
 
   public void setUsers(List<User> users) {
     this.users = users;
+  }
+
+  public DirectMessage getLastMessage() {
+    return lastMessage;
+  }
+
+  public void setLastMessage(DirectMessage lastMessage) {
+    this.lastMessage = lastMessage;
   }
 
   public Date getDateCreated() {

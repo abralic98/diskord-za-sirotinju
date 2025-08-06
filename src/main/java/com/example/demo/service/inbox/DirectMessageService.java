@@ -47,8 +47,14 @@ public class DirectMessageService {
     }
 
     DirectMessage message = new DirectMessage(input.getText(), input.getType(), input.getImageUrl(), inbox, user);
-    dmPublisher.publish(input.getInboxId(), message);
-    return dmRepository.save(message);
+    DirectMessage savedMessage = dmRepository.save(message);
+
+    inbox.setLastMessage(savedMessage);
+    inboxRepository.save(inbox);
+
+    dmPublisher.publish(input.getInboxId(), savedMessage);
+
+    return savedMessage;
   }
 
   public DirectMessagePageDTO getDirectMessagesByInboxId(Long inboxId, int page, int size, String search) {
