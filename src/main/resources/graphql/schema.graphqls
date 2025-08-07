@@ -111,6 +111,7 @@ input CreateUserInput {
 input CreateSessionInput {
   username: String!
   password: String!
+  firebaseToken: String
 }
 
 input UpdateUserInput {

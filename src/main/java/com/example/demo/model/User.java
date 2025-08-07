@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.example.demo.model.enums.UserPresenceType;
+import com.example.demo.model.firebase.Firebase;
 import com.example.demo.model.server.Server;
 import com.example.demo.model.user.BannedUser;
 
@@ -49,6 +50,9 @@ public class User {
   @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<BannedUser> bannedInServers = new ArrayList<>();
 
+  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<Firebase> firebaseTokens = new ArrayList<>();
+
   @Temporal(TemporalType.TIMESTAMP)
   @Column(nullable = false, updatable = false)
   private Date dateCreated;
@@ -56,6 +60,7 @@ public class User {
   @Temporal(TemporalType.TIMESTAMP)
   @Column(nullable = false)
   private Date dateUpdated;
+
 
   public User() {
   }
@@ -156,14 +161,22 @@ public class User {
     this.userPresence = userPresenceType;
   }
 
-  @PrePersist 
-  protected void onCreate() {
-    dateCreated = new Date();
-    dateUpdated = new Date(); 
+  public List<Firebase> getFirebaseTokens() {
+    return firebaseTokens;
   }
 
-  @PreUpdate 
+  public void setFirebaseTokens(List<Firebase> firebaseTokens) {
+    this.firebaseTokens = firebaseTokens;
+  }
+
+  @PrePersist
+  protected void onCreate() {
+    dateCreated = new Date();
+    dateUpdated = new Date();
+  }
+
+  @PreUpdate
   protected void onUpdate() {
-    dateUpdated = new Date(); 
+    dateUpdated = new Date();
   }
 }

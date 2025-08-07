@@ -5,6 +5,7 @@ public class CreateSessionInput {
 
     private String username;
     private String password;
+    private String firebaseToken;
 
     public String getUsername() {
         return username;
@@ -20,5 +21,12 @@ public class CreateSessionInput {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+    public String getFirebaseToken() {
+        return firebaseToken;
+    }
+
+    public void setFirebaseToken(String firebaseToken) {
+        this.firebaseToken = firebaseToken;
     }
 }
