@@ -11,6 +11,7 @@ import com.example.demo.model.firebase.Firebase;
 import com.example.demo.repository.FirebaseRepository;
 import com.example.demo.repository.UserRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,33 +39,48 @@ public class AuthController {
 
   @MutationMapping
   public UserWithToken createSession(@Argument CreateSessionInput credentials) {
-
     String username = credentials.getUsername();
     String password = credentials.getPassword();
     String firebaseToken = credentials.getFirebaseToken();
 
-    User user = userRepository.findByUsername(username).orElseThrow(() -> new ModifiedException("User Not Found"));
-    Boolean isPasswordCorrect = passwordEncoder.matches(password, user.getPassword());
-    Firebase firebase = new Firebase(firebaseToken, user);
-    Optional<Firebase> existingToken = firebaseRepository.findByToken(firebaseToken);
-    if (!isPasswordCorrect) {
+    User user = userRepository.findByUsername(username)
+        .orElseThrow(() -> new ModifiedException("User Not Found"));
+
+    if (!passwordEncoder.matches(password, user.getPassword())) {
       throw new ModifiedException("Invalid credentials");
     }
-    if (user != null && isPasswordCorrect) {
-      String token = jwtUtil.generateToken(username, user.getId());
-      user.setUserPresence(UserPresenceType.ONLINE);
-      user.setActivateUser(true);
-      if (existingToken.isEmpty()) {
-        firebaseRepository.save(firebase);
-      }
-      userRepository.save(user);
-      UserWithToken userWithToken = new UserWithToken();
-      userWithToken.setUser(user);
-      userWithToken.setToken(token);
 
-      return userWithToken;
+    user.setUserPresence(UserPresenceType.ONLINE);
+    user.setActivateUser(true);
+
+    // Find existing Firebase token
+    Optional<Firebase> existingTokenOpt = firebaseRepository.findByToken(firebaseToken);
+    Firebase firebaseTokenEntity;
+
+    if (existingTokenOpt.isPresent()) {
+      firebaseTokenEntity = existingTokenOpt.get();
+      if (!firebaseTokenEntity.getUsers().contains(user)) {
+        firebaseTokenEntity.getUsers().add(user);
+      }
+    } else {
+      firebaseTokenEntity = new Firebase();
+      firebaseTokenEntity.setToken(firebaseToken);
+      firebaseTokenEntity.setUsers(List.of(user));
     }
 
-    throw new ModifiedException("Invalid credentials");
+    if (!user.getFirebaseTokens().contains(firebaseTokenEntity)) {
+      user.getFirebaseTokens().add(firebaseTokenEntity);
+    }
+
+    firebaseRepository.save(firebaseTokenEntity);
+    userRepository.save(user);
+
+    String token = jwtUtil.generateToken(username, user.getId());
+
+    UserWithToken userWithToken = new UserWithToken();
+    userWithToken.setUser(user);
+    userWithToken.setToken(token);
+
+    return userWithToken;
   }
 }

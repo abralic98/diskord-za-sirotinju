@@ -50,7 +50,8 @@ public class User {
   @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<BannedUser> bannedInServers = new ArrayList<>();
 
-  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+  @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+  @JoinTable(name = "user_firebase_tokens", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "firebase_token_id"))
   private List<Firebase> firebaseTokens = new ArrayList<>();
 
   @Temporal(TemporalType.TIMESTAMP)
@@ -60,7 +61,6 @@ public class User {
   @Temporal(TemporalType.TIMESTAMP)
   @Column(nullable = false)
   private Date dateUpdated;
-
 
   public User() {
   }

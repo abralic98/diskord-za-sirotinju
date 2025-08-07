@@ -57,6 +57,18 @@ public class DirectMessage {
     return inbox;
   }
 
+  public User getAuthor() {
+    return author;
+  }
+
+  public String getText() {
+    return text;
+  }
+
+  public String getImageUrl() {
+    return imageUrl;
+  }
+
   @PrePersist
   protected void onCreate() {
     dateCreated = new Date();

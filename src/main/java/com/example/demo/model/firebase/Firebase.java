@@ -2,7 +2,9 @@ package com.example.demo.model.firebase;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import com.example.demo.model.User;
 
@@ -14,19 +16,18 @@ public class Firebase {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(nullable = false, unique = true)
+  @Column(nullable = true, unique = true)
   private String token;
 
-  @ManyToOne
-  @JoinColumn(name = "user_id", nullable = false)
-  private User user;
+  @ManyToMany(mappedBy = "firebaseTokens")
+  private List<User> users = new ArrayList<>();
 
   public Firebase() {
   }
 
-  public Firebase(String token, User user) {
+  public Firebase(String token, List<User> users) {
     this.token = token;
-    this.user = user;
+    this.users = users;
   }
 
   public Long getId() {
@@ -45,12 +46,12 @@ public class Firebase {
     this.token = token;
   }
 
-  public User getUser() {
-    return user;
+  public List<User> getUsers() {
+    return users;
   }
 
-  public void setUser(User user) {
-    this.user = user;
+  public void setUsers(List<User> users) {
+    this.users = users;
   }
 
   @Temporal(TemporalType.TIMESTAMP)
