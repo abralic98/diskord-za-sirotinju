@@ -11,6 +11,7 @@ import com.example.demo.model.firebase.Firebase;
 import com.example.demo.repository.FirebaseRepository;
 import com.example.demo.repository.UserRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -65,7 +66,7 @@ public class AuthController {
     } else {
       firebaseTokenEntity = new Firebase();
       firebaseTokenEntity.setToken(firebaseToken);
-      firebaseTokenEntity.setUsers(List.of(user));
+      firebaseTokenEntity.setUsers(new ArrayList<>(List.of(user)));
     }
 
     if (!user.getFirebaseTokens().contains(firebaseTokenEntity)) {
