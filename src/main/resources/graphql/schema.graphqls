@@ -55,11 +55,14 @@ type Mutation {
   createDirectMessage(message: CreateDMInput): DirectMessage
   removeMeFromInbox(inboxId: ID!): Boolean
   addUserToInbox(inboxId: ID!, userId: ID!): Inbox
+  joinVoiceRoom(serverId: ID!, roomId: ID!): Boolean
+  leaveVoiceRoom(serverId: ID!, roomId: ID!): Boolean
 }
 
 type Subscription {
   subscribeToMessagesByRoomId(roomId: ID!): Message
   subscribeToMessagesByInboxId(inboxId: ID!): DirectMessage
+  subscribeToServer(serverId: ID!): ServerVoiceRoomsDTO
 }
 
 # USERS ##############################
@@ -287,6 +290,17 @@ type SocketUserDTO {
   id: Int!
   username: String!
   avatar: String
+}
+
+type ServerVoiceRoomsDTO {
+  serverId: Int!
+  rooms: [RoomWithUsersDTO]
+}
+
+type RoomWithUsersDTO {
+  roomId: Int!
+  name: String!
+  users: [SocketUserDTO]
 }
 
 ####################################
