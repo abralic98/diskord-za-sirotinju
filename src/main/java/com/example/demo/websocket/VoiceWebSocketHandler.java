@@ -1,65 +1,49 @@
 
 package com.example.demo.websocket;
 
-import com.example.demo.dto.user.SocketUserDTO;
-import com.example.demo.repository.UserRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.springframework.web.socket.*;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
 
 public class VoiceWebSocketHandler extends TextWebSocketHandler {
 
-  // serverId -> (roomId -> list of sessions)
-  private final Map<String, Map<String, List<WebSocketSession>>> servers = new ConcurrentHashMap<>();
+  private final ObjectMapper objectMapper = new ObjectMapper();
 
-  // serverId -> all sessions connected to server (regardless of room)
-  private final Map<String, List<WebSocketSession>> serverSessions = new ConcurrentHashMap<>();
+  // roomId -> Map<session, userId>
+  private final Map<String, Map<WebSocketSession, String>> roomSessions = new ConcurrentHashMap<>();
+
+  // session -> roomId
+  private final Map<WebSocketSession, String> sessionRoom = new ConcurrentHashMap<>();
 
   // session -> userId
-  private final Map<WebSocketSession, Long> sessionUserIdMap = new ConcurrentHashMap<>();
+  private final Map<WebSocketSession, String> sessionUser = new ConcurrentHashMap<>();
 
-  // userId -> serverId
-  private final Map<Long, String> userServerMap = new ConcurrentHashMap<>();
-
-  // userId -> roomId
-  private final Map<Long, String> userRoomMap = new ConcurrentHashMap<>();
-
-  private final ObjectMapper mapper = new ObjectMapper();
-  private final UserRepository userRepository;
-
-  public VoiceWebSocketHandler(UserRepository userRepository) {
-    this.userRepository = userRepository;
+  @Override
+  public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+    // No action yet, wait for join message
   }
 
   @Override
-  public void afterConnectionEstablished(WebSocketSession session) {
-    System.out.println("Connected: " + session.getId());
-  }
+  protected void handleTextMessage(WebSocketSession session, TextMessage message) throws IOException {
+    JsonNode node = objectMapper.readTree(message.getPayload());
 
-  @Override
-  protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-    Map<String, Object> data = mapper.readValue(message.getPayload(), Map.class);
-    String type = (String) data.get("type");
+    String type = node.get("type").asText();
 
     switch (type) {
-      case "joinServer":
-        handleJoinServer(session, data);
+      case "join":
+        handleJoin(session, node);
         break;
 
-      case "joinRoom":
-        handleJoinRoom(session, data);
-        break;
-
-      case "leaveRoom":
-        handleLeaveRoom(session);
-        break;
-
-      case "getPresence":
-        handleGetPresence(session, data);
+      case "offer":
+      case "answer":
+      case "candidate":
+        handleSignal(session, node);
         break;
 
       default:
@@ -67,185 +51,79 @@ public class VoiceWebSocketHandler extends TextWebSocketHandler {
     }
   }
 
-  private void handleJoinServer(WebSocketSession session, Map<String, Object> data) {
-    String serverId = (String) data.get("server");
-    Long userId = parseUserId(data.get("userId"));
+  private void handleJoin(WebSocketSession session, JsonNode node) throws IOException {
+    String roomId = node.get("room").asText();
+    String userId = node.get("userId").asText();
 
-    if (userId == null || serverId == null)
-      return;
+    // Save session info
+    sessionRoom.put(session, roomId);
+    sessionUser.put(session, userId);
 
-    sessionUserIdMap.put(session, userId);
-    userServerMap.put(userId, serverId);
+    roomSessions.putIfAbsent(roomId, new ConcurrentHashMap<>());
+    Map<WebSocketSession, String> sessionsInRoom = roomSessions.get(roomId);
+    sessionsInRoom.put(session, userId);
 
-    servers.putIfAbsent(serverId, new ConcurrentHashMap<>());
-
-    // Add session to serverSessions map
-    serverSessions.putIfAbsent(serverId, Collections.synchronizedList(new ArrayList<>()));
-    List<WebSocketSession> sessions = serverSessions.get(serverId);
-    if (!sessions.contains(session)) {
-      sessions.add(session);
-    }
-  }
-
-  private void handleJoinRoom(WebSocketSession session, Map<String, Object> data) {
-    Long userId = sessionUserIdMap.get(session);
-    if (userId == null)
-      return;
-
-    String serverId = userServerMap.get(userId);
-    if (serverId == null)
-      return;
-
-    String roomId = (String) data.get("room");
-    if (roomId == null)
-      return;
-
-    servers.putIfAbsent(serverId, new ConcurrentHashMap<>());
-    Map<String, List<WebSocketSession>> roomMap = servers.get(serverId);
-
-    // Ensure room list exists, synchronized list for thread safety
-    roomMap.putIfAbsent(roomId, Collections.synchronizedList(new ArrayList<>()));
-
-    // Remove user session from all other rooms in the same server
-    roomMap.values().forEach(sessions -> sessions.remove(session));
-
-    // Add user session to new room
-    roomMap.get(roomId).add(session);
-    userRoomMap.put(userId, roomId);
-
-    broadcastServerPresence(serverId);
-  }
-
-  private void handleLeaveRoom(WebSocketSession session) {
-    Long userId = sessionUserIdMap.get(session);
-    if (userId == null)
-      return;
-
-    String serverId = userServerMap.get(userId);
-    String roomId = userRoomMap.remove(userId);
-
-    if (serverId == null || roomId == null)
-      return;
-
-    Map<String, List<WebSocketSession>> roomMap = servers.getOrDefault(serverId, Collections.emptyMap());
-    List<WebSocketSession> sessions = roomMap.getOrDefault(roomId, Collections.synchronizedList(new ArrayList<>()));
-
-    sessions.remove(session);
-
-    broadcastServerPresence(serverId);
-  }
-
-  private void handleGetPresence(WebSocketSession session, Map<String, Object> data) {
-    String serverId = (String) data.get("serverId");
-    Map<String, Object> sender = (Map<String, Object>) data.get("sender");
-    Long userId = sender != null ? parseUserId(sender.get("id")) : null;
-
-    if (userId != null && serverId != null) {
-      sessionUserIdMap.put(session, userId);
-      userServerMap.put(userId, serverId);
-      servers.putIfAbsent(serverId, new ConcurrentHashMap<>());
-
-      // Add session to serverSessions map if missing
-      serverSessions.putIfAbsent(serverId, Collections.synchronizedList(new ArrayList<>()));
-      List<WebSocketSession> sessions = serverSessions.get(serverId);
-      if (!sessions.contains(session)) {
-        sessions.add(session);
+    // Send existing users to the new user (excluding self)
+    List<String> otherUsers = new ArrayList<>();
+    for (String uid : sessionsInRoom.values()) {
+      if (!uid.equals(userId)) {
+        otherUsers.add(uid);
       }
     }
 
-    broadcastServerPresence(serverId);
+    Map<String, Object> existingUsersMsg = new HashMap<>();
+    existingUsersMsg.put("type", "existingUsers");
+    existingUsersMsg.put("users", otherUsers);
+
+    session.sendMessage(new TextMessage(objectMapper.writeValueAsString(existingUsersMsg)));
+
+    System.out.println("User " + userId + " joined room " + roomId);
   }
 
-  private Long parseUserId(Object userIdObj) {
-    try {
-      if (userIdObj instanceof Number) {
-        return ((Number) userIdObj).longValue();
-      } else if (userIdObj instanceof String) {
-        return Long.parseLong((String) userIdObj);
-      }
-    } catch (NumberFormatException ignored) {
+  private void handleSignal(WebSocketSession session, JsonNode node) throws IOException {
+    String roomId = sessionRoom.get(session);
+    String userId = sessionUser.get(session);
+
+    String receiverId = node.get("receiver").get("id").asText();
+
+    Map<WebSocketSession, String> sessionsInRoom = roomSessions.get(roomId);
+    if (sessionsInRoom == null) {
+      System.out.println("Room not found: " + roomId);
+      return;
     }
-    return null;
+
+    // Find session of receiver
+    WebSocketSession receiverSession = null;
+    for (Map.Entry<WebSocketSession, String> entry : sessionsInRoom.entrySet()) {
+      if (entry.getValue().equals(receiverId)) {
+        receiverSession = entry.getKey();
+        break;
+      }
+    }
+
+    if (receiverSession != null && receiverSession.isOpen()) {
+      // Forward signaling message to the receiver
+      receiverSession.sendMessage(new TextMessage(node.toString()));
+    } else {
+      System.out.println("Receiver session not found or closed: " + receiverId);
+    }
   }
 
   @Override
-  public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
-    System.out.println("Disconnected: " + session.getId());
+  public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+    String roomId = sessionRoom.remove(session);
+    String userId = sessionUser.remove(session);
 
-    Long userId = sessionUserIdMap.remove(session);
-    if (userId == null)
-      return;
-
-    String serverId = userServerMap.remove(userId);
-    String roomId = userRoomMap.remove(userId);
-
-    // Remove session from serverSessions map
-    if (serverId != null) {
-      List<WebSocketSession> sessions = serverSessions.get(serverId);
-      if (sessions != null) {
-        sessions.remove(session);
+    if (roomId != null) {
+      Map<WebSocketSession, String> sessionsInRoom = roomSessions.get(roomId);
+      if (sessionsInRoom != null) {
+        sessionsInRoom.remove(session);
+        if (sessionsInRoom.isEmpty()) {
+          roomSessions.remove(roomId);
+        }
       }
     }
 
-    if (serverId == null || roomId == null)
-      return;
-
-    Map<String, List<WebSocketSession>> roomMap = servers.getOrDefault(serverId, Collections.emptyMap());
-    List<WebSocketSession> sessions = roomMap.getOrDefault(roomId, Collections.synchronizedList(new ArrayList<>()));
-
-    sessions.remove(session);
-
-    broadcastServerPresence(serverId);
-  }
-
-  private void broadcastServerPresence(String serverId) {
-    if (serverId == null)
-      return;
-
-    Map<String, List<WebSocketSession>> roomMap = servers.getOrDefault(serverId, new ConcurrentHashMap<>());
-
-    List<Map<String, Object>> roomsData = new ArrayList<>();
-    roomMap.forEach((roomId, sessions) -> {
-      List<SocketUserDTO> users = sessions.stream()
-          .map(sessionUserIdMap::get)
-          .filter(Objects::nonNull)
-          .map(userRepository::findById)
-          .filter(Optional::isPresent)
-          .map(opt -> new SocketUserDTO(opt.get()))
-          .collect(Collectors.toList());
-
-      Map<String, Object> roomObj = new HashMap<>();
-      roomObj.put("roomId", roomId);
-      roomObj.put("users", users);
-      roomsData.add(roomObj);
-    });
-
-    if (roomsData.isEmpty()) {
-      roomsData.add(Map.of("roomId", "default", "users", List.of()));
-    }
-
-    Map<String, Object> payload = Map.of(
-        "type", "serverPresence",
-        "serverId", serverId,
-        "rooms", roomsData);
-
-    try {
-      String json = mapper.writeValueAsString(payload);
-
-      // Send presence update to ALL sessions connected to the server
-      List<WebSocketSession> allSessions = serverSessions.getOrDefault(serverId, Collections.emptyList());
-
-      allSessions.stream()
-          .filter(WebSocketSession::isOpen)
-          .forEach(session -> {
-            try {
-              session.sendMessage(new TextMessage(json));
-            } catch (Exception e) {
-              e.printStackTrace();
-            }
-          });
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+    System.out.println("User " + userId + " disconnected from room " + roomId);
   }
 }
