@@ -44,7 +44,7 @@ public class SecurityConfig {
     CorsConfiguration corsConfig = new CorsConfiguration();
     corsConfig.setAllowedOrigins(Arrays.asList(
         "http://localhost:3000",
-        "https://ezcomms.linkpc.net"));
+        "https://ezcomms.dev"));
     corsConfig.setAllowedMethods(Arrays.asList("GET", "POST", "OPTIONS"));
     corsConfig.setAllowedHeaders(Arrays.asList("*"));
     corsConfig.setAllowCredentials(true);
