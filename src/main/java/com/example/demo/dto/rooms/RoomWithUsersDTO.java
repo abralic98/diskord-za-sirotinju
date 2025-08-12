@@ -5,18 +5,18 @@ import java.util.List;
 import com.example.demo.dto.user.SocketUserDTO;
 
 public class RoomWithUsersDTO {
-  private Long roomId;
+  private Long id;
   private String name;
   private List<SocketUserDTO> users;
 
-  public RoomWithUsersDTO(Long roomId, String name, List<SocketUserDTO> users) {
-    this.roomId = roomId;
+  public RoomWithUsersDTO(Long id, String name, List<SocketUserDTO> users) {
+    this.id = id;
     this.name = name;
     this.users = users;
   }
 
-  public Long getRoomId() {
-    return roomId;
+  public Long getId() {
+    return id;
   }
 
   public String getName() {
