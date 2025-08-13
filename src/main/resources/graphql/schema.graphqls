@@ -74,6 +74,7 @@ type User {
   phoneNumber: Long
   description: String
   avatar: String
+  banner: String
   userPresence: UserPresenceType
   dateCreated: String
 }

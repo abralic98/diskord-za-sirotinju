@@ -72,8 +72,8 @@ public class UserService {
       currentUser.setAvatar(user.getAvatar());
     }
 
-    if (user.getAvatar() != null) {
-      currentUser.setAvatar(user.getAvatar());
+    if (user.getBanner() != null) {
+      currentUser.setBanner(user.getBanner());
     }
 
     if (user.getUserPresence() != null) {

@@ -11,7 +11,7 @@ public class WebConfig implements WebMvcConfigurer {
     registry.addMapping("/**")
         .allowedOrigins(
             "http://localhost:3000",
-            "https://ezcomms.dev")
+            "https://ezcomms.app")
         .allowedMethods("GET", "POST", "OPTIONS")
         .allowedHeaders("*")
         .allowCredentials(true);

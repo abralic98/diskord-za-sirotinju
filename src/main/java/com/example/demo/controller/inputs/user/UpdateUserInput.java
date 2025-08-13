@@ -6,6 +6,7 @@ public class UpdateUserInput extends CreateUserInput {
   private String description;
   private Long phoneNumber;
   private String avatar;
+  private String banner;
   private UserPresenceType userPresence;
 
   public String getDescription() {
@@ -30,6 +31,14 @@ public class UpdateUserInput extends CreateUserInput {
 
   public void setAvatar(String avatar) {
     this.avatar = avatar;
+  }
+
+  public String getBanner() {
+    return banner;
+  }
+
+  public void setBanner(String banner) {
+    this.banner = banner;
   }
 
   public UserPresenceType getUserPresence() {

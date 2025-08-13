@@ -42,6 +42,9 @@ public class User {
   private String avatar;
 
   @Column(nullable = true)
+  private String banner;
+
+  @Column(nullable = true)
   private UserPresenceType userPresence;
 
   @ManyToMany(mappedBy = "joinedUsers")
@@ -111,6 +114,14 @@ public class User {
 
   public void setAvatar(String avatar) {
     this.avatar = avatar;
+  }
+
+  public String getBanner() {
+    return banner;
+  }
+
+  public void setBanner(String banner) {
+    this.banner = banner;
   }
 
   public Boolean getIsUserActive() {
