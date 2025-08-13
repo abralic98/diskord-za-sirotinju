@@ -1,8 +1,10 @@
 ### local
 1. docker compose build --no-cache zza clean
-2. docker tag demo-springboot-app abralic98/demo-springboot-app:latest
-3. docker login
-4. docker push abralic98/demo-springboot-app:latest
+docker tag demo-springboot-app abralic98/demo-springboot-app:latest
+docker push abralic98/demo-springboot-app:latest
+
+###
+docker login
 
 ### hetzner
 

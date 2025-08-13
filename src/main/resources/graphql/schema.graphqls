@@ -123,6 +123,7 @@ input UpdateUserInput {
   email: String
   phoneNumber: Long
   avatar: String
+  banner: String
   description: String
   userPresence: UserPresenceType
 }
