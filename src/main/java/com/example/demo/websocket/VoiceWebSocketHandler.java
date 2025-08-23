@@ -63,7 +63,11 @@ public class VoiceWebSocketHandler extends TextWebSocketHandler {
         break;
       case "ping":
         send(session, pong());
+
+      case "trackUpdate":
+        handleTrackUpdate(session, node);
         break;
+
       default:
         send(session, error("unknownType", type));
     }
@@ -163,6 +167,36 @@ public class VoiceWebSocketHandler extends TextWebSocketHandler {
 
   private void handleLeave(WebSocketSession session) throws IOException {
     cleanupSession(session);
+  }
+
+  private void handleTrackUpdate(WebSocketSession session, JsonNode node) throws IOException {
+    String roomId = sessionRoom.get(session);
+    String userId = sessionUser.get(session);
+
+    if (roomId == null || userId == null) {
+      send(session, error("notInRoom", "Join a room before updating tracks"));
+      return;
+    }
+
+    String track = text(node, "track"); // "audio" or "video"
+    if (track == null || (!track.equals("audio") && !track.equals("video"))) {
+      send(session, error("invalidTrack", "Track must be 'audio' or 'video'"));
+      return;
+    }
+
+    boolean enabled = node.get("enabled").asBoolean();
+
+    // Build broadcast message
+    ObjectNode out = json.createObjectNode();
+    out.put("type", "trackUpdate");
+    out.put("user", userId);
+    out.put("track", track);
+    out.put("enabled", enabled);
+
+    // Broadcast to everyone else in the room
+    broadcastExcept(roomId, session, out);
+
+    log("trackUpdate", "user=%s room=%s track=%s enabled=%s", userId, roomId, track, enabled);
   }
 
   @Override
