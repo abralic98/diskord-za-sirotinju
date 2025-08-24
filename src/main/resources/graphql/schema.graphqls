@@ -63,6 +63,7 @@ type Subscription {
   subscribeToMessagesByRoomId(roomId: ID!): Message
   subscribeToMessagesByInboxId(inboxId: ID!): DirectMessage
   subscribeToServer(serverId: ID!, userId: ID!): ServerVoiceRoomsDTO
+  monitorServerChanges(serverId: ID): Room
 }
 
 # USERS ##############################

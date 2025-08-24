@@ -18,9 +18,7 @@ public class CurrentAuthenticatedUser {
   }
 
   public User getUser() {
-    System.out.println("ovde sam");
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    System.out.println(authentication);
     if (authentication == null || !authentication.isAuthenticated()) {
       throw new RuntimeException("No authenticated user found");
     }
@@ -39,10 +37,9 @@ public class CurrentAuthenticatedUser {
     Authentication currentAuth = SecurityContextHolder.getContext().getAuthentication();
 
     Authentication newAuth = new UsernamePasswordAuthenticationToken(
-        updatedUser.getId(),  
+        updatedUser.getId(),
         currentAuth.getCredentials(),
-        currentAuth.getAuthorities()
-    );
+        currentAuth.getAuthorities());
 
     SecurityContextHolder.getContext().setAuthentication(newAuth);
   }

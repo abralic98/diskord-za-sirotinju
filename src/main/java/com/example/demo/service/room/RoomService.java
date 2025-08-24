@@ -13,8 +13,12 @@ import com.example.demo.model.User;
 import com.example.demo.model.enums.RoomType;
 import com.example.demo.model.room.Room;
 import com.example.demo.model.server.Server;
+import com.example.demo.publishers.RoomPublisher;
 import com.example.demo.repository.RoomRepository;
 import com.example.demo.repository.ServerRepository;
+
+import reactor.core.publisher.Flux;
+
 import com.example.demo.dto.rooms.Rooms;
 
 @Service
@@ -23,12 +27,14 @@ public class RoomService {
   private final RoomRepository roomRepository;
   private final ServerRepository serverRepository;
   private final CurrentAuthenticatedUser currentAuthenticatedUser;
+  private final RoomPublisher roomPublisher;
 
   public RoomService(RoomRepository roomRepository, ServerRepository serverRepository,
-      CurrentAuthenticatedUser currentAuthenticatedUser) {
+      CurrentAuthenticatedUser currentAuthenticatedUser, RoomPublisher roomPublisher) {
     this.roomRepository = roomRepository;
     this.currentAuthenticatedUser = currentAuthenticatedUser;
     this.serverRepository = serverRepository;
+    this.roomPublisher = roomPublisher;
   }
 
   public Room getRoomById(Long id) {
@@ -52,7 +58,11 @@ public class RoomService {
         .orElseThrow(() -> new ModifiedException("Server with this id does not exist"));
 
     Room room = new Room(input.getName(), user, server, input.getType());
-    return roomRepository.save(room);
+    Room saved = roomRepository.save(room);
+
+    roomPublisher.publish(server.getId(), saved);
+
+    return saved;
   }
 
   public Rooms getRoomsByServerId(Long id) {
@@ -80,4 +90,9 @@ public class RoomService {
 
     return result;
   }
+
+  public Flux<Room> monitorServerChanges(Long serverId) {
+    return roomPublisher.subscribe(serverId);
+  }
+
 }
