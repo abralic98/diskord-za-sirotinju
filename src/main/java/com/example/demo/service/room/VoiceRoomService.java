@@ -4,6 +4,8 @@ package com.example.demo.service.room;
 import com.example.demo.dto.rooms.RoomWithUsersDTO;
 import com.example.demo.dto.server.ServerVoiceRoomsDTO;
 import com.example.demo.dto.user.SocketUserDTO;
+import com.example.demo.helpers.CurrentAuthenticatedUser;
+import com.example.demo.model.User;
 import com.example.demo.model.enums.RoomType;
 import com.example.demo.model.room.Room;
 import com.example.demo.repository.RoomRepository;
@@ -28,20 +30,27 @@ public class VoiceRoomService {
 
   private final UserRepository userRepository;
   private final RoomRepository roomRepository;
+  private final CurrentAuthenticatedUser currentAuthenticatedUser;
 
-  public VoiceRoomService(UserRepository userRepository, RoomRepository roomRepository) {
+  public VoiceRoomService(UserRepository userRepository, RoomRepository roomRepository,
+      CurrentAuthenticatedUser currentAuthenticatedUser) {
     this.userRepository = userRepository;
     this.roomRepository = roomRepository;
+    this.currentAuthenticatedUser = currentAuthenticatedUser;
   }
 
-  public Flux<ServerVoiceRoomsDTO> subscribeToServer(Long serverId) {
+  public Flux<ServerVoiceRoomsDTO> subscribeToServer(Long serverId, Long userId) {
     serverSinks.putIfAbsent(serverId, Sinks.many().replay().latest());
     servers.putIfAbsent(serverId, new ConcurrentHashMap<>());
 
     // Emit initial full state immediately
     serverSinks.get(serverId).tryEmitNext(buildServerDTO(serverId));
 
-    return serverSinks.get(serverId).asFlux();
+    return serverSinks.get(serverId)
+        .asFlux()
+        .doFinally(signalType -> {
+          forceLeaveAllRooms(serverId, userId);
+        });
   }
 
   public void joinRoom(Long serverId, Long roomId, Long userId) {
@@ -76,6 +85,15 @@ public class VoiceRoomService {
     }
   }
 
+  // if refresh or close tab
+  public void forceLeaveAllRooms(Long serverId, Long userId) {
+    if (!servers.containsKey(serverId))
+      return;
+
+    servers.get(serverId).values().forEach(set -> set.remove(userId));
+    emitUpdate(serverId);
+  }
+
   private ServerVoiceRoomsDTO buildServerDTO(Long serverId) {
     List<Room> voiceRooms = roomRepository.findByServerIdAndType(serverId, RoomType.VOICE);
 
@@ -100,4 +118,3 @@ public class VoiceRoomService {
   }
 
 }
-

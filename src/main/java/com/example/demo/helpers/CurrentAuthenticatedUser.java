@@ -18,7 +18,9 @@ public class CurrentAuthenticatedUser {
   }
 
   public User getUser() {
+    System.out.println("ovde sam");
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    System.out.println(authentication);
     if (authentication == null || !authentication.isAuthenticated()) {
       throw new RuntimeException("No authenticated user found");
     }

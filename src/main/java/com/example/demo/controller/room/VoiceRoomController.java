@@ -24,8 +24,8 @@ public class VoiceRoomController {
   }
 
   @SubscriptionMapping
-  public Flux<ServerVoiceRoomsDTO> subscribeToServer(@Argument Long serverId) {
-    return voiceRoomService.subscribeToServer(serverId);
+  public Flux<ServerVoiceRoomsDTO> subscribeToServer(@Argument Long serverId, @Argument Long userId) {
+    return voiceRoomService.subscribeToServer(serverId, userId);
   }
 
   @MutationMapping

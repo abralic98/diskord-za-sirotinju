@@ -62,7 +62,7 @@ type Mutation {
 type Subscription {
   subscribeToMessagesByRoomId(roomId: ID!): Message
   subscribeToMessagesByInboxId(inboxId: ID!): DirectMessage
-  subscribeToServer(serverId: ID!): ServerVoiceRoomsDTO
+  subscribeToServer(serverId: ID!, userId: ID!): ServerVoiceRoomsDTO
 }
 
 # USERS ##############################
